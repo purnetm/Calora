@@ -1,11 +1,10 @@
 import React from "react";
 import svgPaths from "../../imports/svg-ecdjpw5ij2";
 
-// Imported assets from Figma
-import imgCheesecake from "figma:asset/ab9f21612d7a46fdfefa46d9ab4fe9080ce25033.png";
-import imgMacarons from "figma:asset/8e16a308b8dc42ec487ab11abcdd1eb65d9e0996.png";
-import imgIceCream from "figma:asset/9bae713b55ab69625164ff4da1b7a40b175810e9.png";
-import imgBrownie from "figma:asset/58d8e711e49b98f5cad5aaa7302ab8749466b245.png";
+const imgCheesecake = "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=800&q=80";
+const imgMacarons = "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=80";
+const imgIceCream = "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?auto=format&fit=crop&w=800&q=80";
+const imgBrownie = "https://images.unsplash.com/photo-1606101273945-e9eba89d4f62?auto=format&fit=crop&w=800&q=80";
 
 const TOP_STYLES = [
   { left: "7.08px", top: "39.53px", rotate: "-60.01deg" },
