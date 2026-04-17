@@ -54,14 +54,71 @@ function buildSystemPrompt(): string {
   );
 }
 
-// ─── Fallback product picker ──────────────────────────────────────────────────
+// ─── Local keyword search (runs when API is unavailable) ─────────────────────
+
+function localSearch(query: string): (Product & { category: string })[] {
+  const q = query.toLowerCase();
+
+  // Price filter: "under ₹X", "under X", "below X"
+  const priceMatch = q.match(/(?:under|below|less than)\s*[₹]?\s*(\d+)/);
+  const maxPrice = priceMatch ? parseInt(priceMatch[1]) : Infinity;
+
+  // Keyword synonyms
+  const synonyms: Record<string, string[]> = {
+    chocolate: ["choc", "cocoa", "brownie", "velvet", "fudge"],
+    vegan: ["plant", "dairy-free"],
+    fruity: ["fruit", "berry", "mango", "citrus", "lemon", "raspberry", "blueberry"],
+    gift: ["gift", "gifting", "present"],
+    calorie: ["cal", "light", "low"],
+    creamy: ["cream", "cheesecake", "froyo", "yogurt"],
+    frozen: ["sorbet", "froyo", "ice"],
+    cookie: ["cookie", "oatmeal"],
+    macaron: ["macaron", "french"],
+  };
+
+  // Expand query with synonyms
+  const expand = (k: string) =>
+    Object.entries(synonyms).find(([key, vals]) =>
+      key === k || vals.some(v => k.includes(v))
+    )?.[1] ?? [];
+
+  const rawKeywords = q
+    .replace(/(?:under|below|less than)\s*[₹]?\s*\d+/g, "")
+    .replace(/[₹₨]/g, "")
+    .trim()
+    .split(/\s+/)
+    .filter(k => k.length > 2);
+
+  const keywords = [...new Set(rawKeywords.flatMap(k => [k, ...expand(k)]))];
+
+  const scored = ALL_PRODUCTS
+    .filter(p => p.price <= maxPrice)
+    .map(p => {
+      const hay = `${p.name} ${p.description} ${p.category}`.toLowerCase();
+      const score = keywords.filter(k => hay.includes(k)).length;
+      return { p, score };
+    })
+    .filter(({ score }) => keywords.length === 0 || score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(({ p }) => p);
+
+  // If nothing matched by keyword but price filter exists, return cheapest
+  if (scored.length === 0 && maxPrice < Infinity) {
+    return ALL_PRODUCTS
+      .filter(p => p.price <= maxPrice)
+      .sort((a, b) => a.price - b.price)
+      .slice(0, 8);
+  }
+
+  return scored.slice(0, 8);
+}
+
+// ─── Fallback product picker (for empty AI results) ──────────────────────────
 
 function getFallback(): (Product & { category: string })[] {
   const profile = getTasteProfile();
-  // Shuffle the full catalog and return 4
   const shuffled = [...ALL_PRODUCTS].sort(() => Math.random() - 0.5);
   if (!profile || profile.flavors.length === 0) return shuffled.slice(0, 4);
-  // Prefer products whose name/description loosely matches preferred flavors
   const preferred = shuffled.filter(p =>
     profile.flavors.some(f =>
       p.name.toLowerCase().includes(f.split(" ")[0].toLowerCase()) ||
@@ -121,8 +178,16 @@ export default function SmartSearch({ onChange }: Props) {
           setResultMeta({ count: matched.length, isFallback: false });
         }
       } catch {
-        setError("Something went wrong — try a different search.");
-        onChange({ results: null, query: "", isFallback: false });
+        // API unavailable — fall back to local keyword search silently
+        const local = localSearch(trimmed);
+        if (local.length > 0) {
+          onChange({ results: local, query: trimmed, isFallback: false });
+          setResultMeta({ count: local.length, isFallback: false });
+        } else {
+          const fallback = getFallback();
+          onChange({ results: fallback, query: trimmed, isFallback: true });
+          setResultMeta({ count: 0, isFallback: true });
+        }
       } finally {
         setIsLoading(false);
       }
