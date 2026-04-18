@@ -2,98 +2,61 @@
 
 :root {
   --font-size: 16px;
-  /* Hero Background #fafafa */
-  --background: #fafafa;
-  /* Hero Foreground #212121 */
-  --foreground: #212121;
-  
-  /* Cards are white */
-  --card: #ffffff;
-  --card-foreground: #212121;
-  
-  --popover: #ffffff;
-  --popover-foreground: #212121;
-  
-  /* Primary Button #9575cd */
-  --primary: #9575cd;
-  --primary-foreground: #ffffff;
-  
-  /* Secondary/Accents (derived from badges) */
-  /* Green badge #C8E6C9 */
-  --secondary: #C8E6C9;
-  --secondary-foreground: #212121;
-  
-  /* Muted background for sections */
-  --muted: #f4f4f5;
-  --muted-foreground: #757575;
-  
-  /* Orange badge #FFCC80 */
-  --accent: #FFCC80;
-  --accent-foreground: #212121;
-  
-  /* Pink badge #FFCDD2 */
-  --destructive: #FFCDD2;
-  --destructive-foreground: #212121;
-  
-  /* Hero Border #212121 */
-  --border: #212121;
-  --input: #212121;
-  --ring: #9575cd;
-  
-  /* Chart colors - keeping defaults or adjusting to pastel */
-  --chart-1: #9575cd;
-  --chart-2: #C8E6C9;
-  --chart-3: #FFCC80;
-  --chart-4: #FFCDD2;
-  --chart-5: #757575;
-  
-  /* Radius - Hero uses 16px, 32px, 40px, 360px. */
-  /* Setting base radius to 2rem (32px) for the bubbly look */
-  --radius: 2rem;
-  
-  --sidebar: #ffffff;
-  --sidebar-foreground: #212121;
-  --sidebar-primary: #9575cd;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f4f4f5;
-  --sidebar-accent-foreground: #212121;
-  --sidebar-border: #212121;
-  --sidebar-ring: #9575cd;
-}
 
-.dark {
-  --background: #212121;
-  --foreground: #fafafa;
-  --card: #2c2c2c;
-  --card-foreground: #fafafa;
-  --popover: #2c2c2c;
-  --popover-foreground: #fafafa;
-  --primary: #9575cd;
-  --primary-foreground: #ffffff;
-  --secondary: #2e3e30;
-  --secondary-foreground: #fafafa;
-  --muted: #2c2c2c;
-  --muted-foreground: #a1a1aa;
-  --accent: #3e3020;
-  --accent-foreground: #fafafa;
-  --destructive: #3e2020;
-  --destructive-foreground: #fafafa;
-  --border: #404040;
-  --input: #404040;
-  --ring: #9575cd;
-  --chart-1: #9575cd;
-  --chart-2: #C8E6C9;
-  --chart-3: #FFCC80;
-  --chart-4: #FFCDD2;
-  --chart-5: #757575;
-  --sidebar: #212121;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #9575cd;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2c2c2c;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: #404040;
-  --sidebar-ring: #9575cd;
+  /* ── Patisserie Palette ─────────────────────────────────── */
+  --color-cream:            #FBF7F0;
+  --color-ivory:            #F4ECE0;
+  --color-bone:             #EDE4D3;
+  --color-taupe:            #A89A86;
+  --color-ink:              #2B2012;
+  --color-espresso:         #1A1210;
+  --color-pistachio:        #CFE6CE;
+  --color-pistachio-deep:   #9FBF8E;
+  --color-rose:             #F4D6D8;
+  --color-gold:             #B89050;
+  --color-burgundy:         #5B1A26;
+
+  --color-background:       var(--color-cream);
+  --color-foreground:       var(--color-ink);
+  --color-muted:            var(--color-taupe);
+  --color-border:           #E7DCC8;
+  --color-accent:           var(--color-pistachio-deep);
+  --color-ring:             var(--color-gold);
+
+  /* shadcn/ui token aliases */
+  --color-card:             var(--color-ivory);
+  --color-card-foreground:  var(--color-ink);
+  --color-popover:          var(--color-ivory);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary:          var(--color-ink);
+  --color-primary-foreground: var(--color-cream);
+  --color-secondary:        var(--color-bone);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted-foreground: var(--color-taupe);
+  --color-destructive:      var(--color-burgundy);
+  --color-input:            var(--color-bone);
+
+  /* legacy :root aliases consumed by @theme inline */
+  --background:             var(--color-cream);
+  --foreground:             var(--color-ink);
+  --card:                   var(--color-ivory);
+  --card-foreground:        var(--color-ink);
+  --popover:                var(--color-ivory);
+  --popover-foreground:     var(--color-ink);
+  --primary:                var(--color-ink);
+  --primary-foreground:     var(--color-cream);
+  --secondary:              var(--color-bone);
+  --secondary-foreground:   var(--color-ink);
+  --muted:                  var(--color-bone);
+  --muted-foreground:       var(--color-taupe);
+  --accent:                 var(--color-pistachio-deep);
+  --accent-foreground:      var(--color-ink);
+  --destructive:            var(--color-burgundy);
+  --destructive-foreground: var(--color-cream);
+  --border:                 #E7DCC8;
+  --input:                  var(--color-bone);
+  --ring:                   var(--color-gold);
+  --radius:                 2px;
 }
 
 @theme inline {
@@ -116,26 +79,16 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 1px);
+  --radius-md: var(--radius);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  
-  /* Font Family - Lato is already imported */
-  --font-lato: 'Lato', sans-serif;
+  --radius-xl: var(--radius);
+
+  /* Font families */
+  --font-display: "Italiana", "Cormorant Garamond", serif;
+  --font-serif:   "Cormorant Garamond", Georgia, serif;
+  --font-sans:    "Inter", ui-sans-serif, system-ui;
+  --font-script:  "Pinyon Script", cursive;
 }
 
 @layer base {
@@ -144,6 +97,15 @@
   }
 
   body {
-    @apply bg-background text-foreground font-lato;
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  h1, h2 {
+    font-family: var(--font-display);
+    font-weight: 300;
   }
 }

@@ -133,20 +133,20 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
     <Dialog.Root open={isOpen} onOpenChange={open => !open && handleDismiss()}>
       <Dialog.Portal>
         {/* Backdrop */}
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
 
         {/* Panel */}
         <Dialog.Content
           aria-describedby={undefined}
-          className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden focus:outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] duration-200"
+          className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-[--color-ivory] border border-[--color-border] overflow-hidden focus:outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-[8px] data-[state=closed]:slide-out-to-top-[8px] duration-400"
         >
           {/* Progress bar */}
           {!completed && (
-            <div className="h-1 bg-muted w-full">
+            <div className="h-0.5 bg-[--color-bone] w-full">
               <motion.div
-                className="h-full bg-primary"
+                className="h-full bg-[--color-ink]"
                 animate={{ width: `${((step + 1) / 3) * 100}%` }}
-                transition={{ duration: 0.35, ease: "easeInOut" }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
               />
             </div>
           )}
@@ -154,9 +154,9 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
           {/* Close */}
           <Dialog.Close
             onClick={handleDismiss}
-            className="absolute top-4 right-4 z-10 p-1.5 rounded-full hover:bg-muted transition-colors text-muted-foreground"
+            className="absolute top-4 right-4 z-10 p-1.5 hover:bg-[--color-bone] transition-colors duration-300 text-[--color-taupe]"
           >
-            <X size={17} />
+            <X size={16} />
           </Dialog.Close>
 
           <div className="p-8 min-h-[440px] flex flex-col">
@@ -164,15 +164,28 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
               {completed ? (
                 <motion.div
                   key="done"
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                   className="flex flex-col items-center justify-center flex-1 gap-5 text-center py-8"
                 >
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-2xl">✦</div>
+                  <div
+                    style={{ fontFamily: "var(--font-serif)" }}
+                    className="text-4xl text-[--color-taupe]"
+                  >
+                    ✦
+                  </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-foreground">You're all set!</h3>
-                    <p className="text-muted-foreground mt-2 text-sm leading-relaxed max-w-xs mx-auto">
+                    <h3
+                      style={{ fontFamily: "var(--font-display)" }}
+                      className="text-2xl font-light text-[--color-ink]"
+                    >
+                      You're all set.
+                    </h3>
+                    <p
+                      style={{ fontFamily: "var(--font-sans)" }}
+                      className="text-[--color-taupe] mt-2 text-sm font-light leading-relaxed max-w-xs mx-auto"
+                    >
                       Your picks are saved — we'll personalise everything for you.
                     </p>
                   </div>
@@ -185,18 +198,29 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={{ duration: 0.22, ease: "easeInOut" }}
+                  transition={{ duration: 0.22, ease: "easeOut" }}
                   className="flex flex-col gap-6 flex-1"
                 >
                   {/* Header */}
                   <div>
-                    <p className="text-xs text-muted-foreground tracking-wide uppercase mb-1.5">
+                    <p
+                      style={{ fontFamily: "var(--font-sans)" }}
+                      className="text-[11px] text-[--color-taupe] tracking-[0.14em] uppercase mb-1.5"
+                    >
                       Step {step + 1} of 3
                     </p>
-                    <Dialog.Title className="text-2xl font-semibold text-foreground leading-snug">
+                    <Dialog.Title
+                      style={{ fontFamily: "var(--font-display)" }}
+                      className="text-2xl font-light text-[--color-ink] leading-snug"
+                    >
                       {STEPS[step].title}
                     </Dialog.Title>
-                    <p className="text-sm text-muted-foreground mt-1.5">{STEPS[step].subtitle}</p>
+                    <p
+                      style={{ fontFamily: "var(--font-sans)" }}
+                      className="text-sm font-light text-[--color-taupe] mt-1.5"
+                    >
+                      {STEPS[step].subtitle}
+                    </p>
                   </div>
 
                   {/* Step 1 — Flavors */}
@@ -206,13 +230,14 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                         <button
                           key={f}
                           onClick={() => toggle(flavors, f, setFlavors)}
-                          className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
+                          style={{ fontFamily: "var(--font-sans)" }}
+                          className={`px-4 py-2 border text-xs font-medium transition-all duration-150 flex items-center gap-1.5 uppercase tracking-[0.08em] cursor-pointer ${
                             flavors.includes(f)
-                              ? "bg-primary text-white border-primary shadow-sm"
-                              : "bg-white text-foreground border-border hover:border-primary/60"
+                              ? "bg-[--color-ink] text-[--color-cream] border-[--color-ink]"
+                              : "bg-transparent text-[--color-ink] border-[--color-border] hover:border-[--color-ink]"
                           }`}
                         >
-                          {flavors.includes(f) && <Check size={12} strokeWidth={3} />}
+                          {flavors.includes(f) && <Check size={11} strokeWidth={3} />}
                           {f}
                         </button>
                       ))}
@@ -226,13 +251,14 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                         <button
                           key={d}
                           onClick={() => toggle(dietary, d, setDietary)}
-                          className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
+                          style={{ fontFamily: "var(--font-sans)" }}
+                          className={`px-4 py-2 border text-xs font-medium transition-all duration-150 flex items-center gap-1.5 uppercase tracking-[0.08em] cursor-pointer ${
                             dietary.includes(d)
-                              ? "bg-primary text-white border-primary shadow-sm"
-                              : "bg-white text-foreground border-border hover:border-primary/60"
+                              ? "bg-[--color-ink] text-[--color-cream] border-[--color-ink]"
+                              : "bg-transparent text-[--color-ink] border-[--color-border] hover:border-[--color-ink]"
                           }`}
                         >
-                          {dietary.includes(d) && <Check size={12} strokeWidth={3} />}
+                          {dietary.includes(d) && <Check size={11} strokeWidth={3} />}
                           {d}
                         </button>
                       ))}
@@ -241,21 +267,22 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
 
                   {/* Step 3 — Occasion */}
                   {step === 2 && (
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
                       {OCCASION_OPTIONS.map(o => (
                         <button
                           key={o.label}
                           onClick={() => setOccasion(o.label)}
-                          className={`flex items-center gap-4 px-5 py-4 rounded-xl border text-left font-medium transition-all duration-150 ${
+                          style={{ fontFamily: "var(--font-sans)" }}
+                          className={`flex items-center gap-4 px-5 py-4 border text-left transition-all duration-150 cursor-pointer ${
                             occasion === o.label
-                              ? "bg-primary/5 border-primary text-foreground"
-                              : "bg-white border-border hover:border-primary/50"
+                              ? "bg-[--color-bone] border-[--color-ink] text-[--color-ink]"
+                              : "bg-transparent border-[--color-border] text-[--color-ink] hover:border-[--color-ink]"
                           }`}
                         >
-                          <span className="text-2xl leading-none">{o.emoji}</span>
-                          <span className="text-sm">{o.label}</span>
+                          <span className="text-xl leading-none">{o.emoji}</span>
+                          <span className="text-xs uppercase tracking-[0.08em] font-medium">{o.label}</span>
                           {occasion === o.label && (
-                            <Check size={16} className="ml-auto text-primary" strokeWidth={2.5} />
+                            <Check size={14} className="ml-auto text-[--color-ink]" strokeWidth={2.5} />
                           )}
                         </button>
                       ))}
@@ -263,11 +290,12 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                   )}
 
                   {/* Navigation */}
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-border/40">
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-[--color-border]">
                     {step > 0 ? (
                       <button
                         onClick={goBack}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        style={{ fontFamily: "var(--font-sans)" }}
+                        className="text-xs text-[--color-taupe] uppercase tracking-[0.1em] hover:text-[--color-ink] transition-colors duration-300"
                       >
                         ← Back
                       </button>
@@ -279,15 +307,17 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                       <button
                         onClick={goNext}
                         disabled={!canNext[step]}
-                        className="flex items-center gap-1.5 px-6 py-2.5 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+                        style={{ fontFamily: "var(--font-sans)" }}
+                        className="flex items-center gap-1.5 px-6 py-2.5 bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.1em] font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[--color-espresso] transition-colors duration-300 cursor-pointer"
                       >
-                        Continue <ChevronRight size={15} />
+                        Continue <ChevronRight size={14} />
                       </button>
                     ) : (
                       <button
                         onClick={handleComplete}
                         disabled={!canNext[2]}
-                        className="flex items-center gap-1.5 px-6 py-2.5 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+                        style={{ fontFamily: "var(--font-sans)" }}
+                        className="flex items-center gap-1.5 px-6 py-2.5 bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.1em] font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[--color-espresso] transition-colors duration-300 cursor-pointer"
                       >
                         Save preferences ✦
                       </button>

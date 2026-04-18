@@ -124,12 +124,12 @@ function AISkeleton() {
   return (
     <div className="flex flex-col gap-2.5 animate-pulse pt-3">
       <div className="flex gap-1.5">
-        <div className="h-6 w-24 bg-muted rounded-full" />
-        <div className="h-6 w-20 bg-muted rounded-full" />
-        <div className="h-6 w-28 bg-muted rounded-full" />
+        <div className="h-5 w-20 bg-[--color-bone]" />
+        <div className="h-5 w-16 bg-[--color-bone]" />
+        <div className="h-5 w-24 bg-[--color-bone]" />
       </div>
-      <div className="h-3 bg-muted rounded w-4/5" />
-      <div className="h-3 bg-muted rounded w-3/5" />
+      <div className="h-2.5 bg-[--color-bone] w-4/5" />
+      <div className="h-2.5 bg-[--color-bone] w-3/5" />
     </div>
   );
 }
@@ -146,11 +146,9 @@ export default function ProductCard({
   const [streamError, setStreamError] = useState<string | null>(null);
   const [aiData, setAiData] = useState<AIProductData | null>(null);
 
-  // Per-card cache — survives re-renders, not persisted
   const cache = useRef<AIProductData | null>(null);
   const buffer = useRef("");
 
-  // ── Streaming fetch ────────────────────────────────────────────────────────
   const fetchAI = useCallback(async () => {
     if (cache.current) {
       setAiData(cache.current);
@@ -168,7 +166,6 @@ export default function ProductCard({
         maxTokens: 300,
         onChunk: (text) => {
           buffer.current += text;
-          // Try incremental parse so UI can appear as soon as JSON is valid
           try {
             const parsed = JSON.parse(buffer.current) as AIProductData;
             cache.current = parsed;
@@ -183,7 +180,6 @@ export default function ProductCard({
               cache.current = parsed;
               setAiData(parsed);
             } catch {
-              // JSON parse failed — use mock so the UI never looks broken
               const mock = getMockFlavor(name, description);
               cache.current = mock;
               setAiData(mock);
@@ -192,7 +188,6 @@ export default function ProductCard({
         },
         onError: () => {
           setIsStreaming(false);
-          // API unavailable — show realistic mock data instead of an error
           const mock = getMockFlavor(name, description);
           cache.current = mock;
           setAiData(mock);
@@ -201,7 +196,6 @@ export default function ProductCard({
     );
   }, [name, description, calories]);
 
-  // ── Toggle expand ──────────────────────────────────────────────────────────
   const toggleExpand = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isExpanded) {
@@ -212,7 +206,6 @@ export default function ProductCard({
     }
   }, [isExpanded, fetchAI]);
 
-  // ── Escape key to close ───────────────────────────────────────────────────
   useEffect(() => {
     if (!isExpanded) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsExpanded(false); };
@@ -222,51 +215,64 @@ export default function ProductCard({
 
   const handleAddToCart = () => addToCart({ id, name, price, image, calories });
 
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <motion.div
       layout
       transition={{ layout: { duration: 0.3, ease: "easeInOut" } }}
-      className={`bg-card border border-border rounded-lg overflow-hidden flex flex-col group transition-shadow hover:shadow-lg ${
+      className={`bg-[--color-card] border border-[--color-border] overflow-hidden flex flex-col group transition-all duration-300 hover:border-[--color-ink] hover:-translate-y-0.5 ${
         compact ? "text-sm" : ""
-      } ${isExpanded ? "shadow-xl ring-1 ring-primary/20" : ""}`}
+      } ${isExpanded ? "border-[--color-ink]" : ""}`}
     >
       {/* Image */}
-      <div className={`relative overflow-hidden border-b border-border ${compact ? "aspect-[4/3]" : "aspect-square"}`}>
+      <div className={`relative overflow-hidden border-b border-[--color-border] ${compact ? "aspect-[4/3]" : "aspect-square"}`}>
         <img
           src={image}
           alt={name}
           className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
         />
         <div
-          className={`absolute bg-white/90 backdrop-blur-sm rounded-full border border-border font-medium shadow-sm flex items-center justify-center ${
-            compact ? "top-2 right-2 px-2 py-0.5 text-xs" : "top-4 right-4 px-3 py-1 text-sm"
+          className={`absolute bg-[--color-cream]/80 backdrop-blur-sm border border-[--color-border] flex items-center justify-center ${
+            compact ? "top-2 right-2 px-2 py-0.5" : "top-3 right-3 px-2 py-0.5"
           }`}
         >
-          {calories} cal
+          <span
+            style={{ fontFamily: "var(--font-sans)" }}
+            className="text-[10px] uppercase tracking-[0.1em] text-[--color-ink]"
+          >
+            {calories} cal
+          </span>
         </div>
       </div>
 
       {/* Body */}
-      <div className={`flex flex-col flex-grow ${compact ? "p-3 gap-2" : "p-6 gap-3"}`}>
+      <div className={`flex flex-col flex-grow ${compact ? "p-3 gap-2" : "p-5 gap-3"}`}>
         {/* Name + price */}
         <div className="flex justify-between items-start gap-2">
           <button
             onClick={toggleExpand}
-            className={`font-medium text-foreground text-left hover:text-primary transition-colors ${
-              compact ? "text-base leading-tight" : "text-xl"
+            style={{ fontFamily: "var(--font-serif)" }}
+            className={`font-normal text-[--color-ink] text-left hover:text-[--color-taupe] transition-colors duration-300 tracking-[-0.01em] ${
+              compact ? "text-sm leading-tight" : "text-base"
             }`}
           >
             {name}
           </button>
-          <span className="font-semibold shrink-0">₹{price.toFixed(2)}</span>
+          <span
+            style={{ fontFamily: "var(--font-serif)" }}
+            className="text-sm font-medium shrink-0 text-[--color-ink]"
+          >
+            ₹{price.toFixed(2)}
+          </span>
         </div>
 
-        <p className={`text-muted-foreground line-clamp-2 ${compact ? "text-xs" : "text-sm"}`}>
+        <p
+          style={{ fontFamily: "var(--font-sans)" }}
+          className={`text-[--color-taupe] font-light line-clamp-2 ${compact ? "text-[11px]" : "text-xs"}`}
+        >
           {description}
         </p>
 
-        {/* ── AI expanded section ─────────────────────────────────────────── */}
+        {/* ── AI expanded section ───────────────────────────────────── */}
         <AnimatePresence>
           {isExpanded && (
             <motion.div
@@ -277,31 +283,33 @@ export default function ProductCard({
               transition={{ duration: 0.28, ease: "easeInOut" }}
               className="overflow-hidden"
             >
-              <div className="pt-3 border-t border-border/50">
-                {/* Loading skeleton */}
+              <div className="pt-3 mt-1 border-t border-[--color-border] bg-[--color-bone] -mx-3 px-3 pb-3">
                 {isStreaming && !aiData && <AISkeleton />}
 
-                {/* Structured AI data */}
                 {aiData && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.25 }}
-                    className="flex flex-col gap-3"
+                    className="flex flex-col gap-3 pt-1"
                   >
                     {/* Flavor tags */}
                     <div>
-                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">
+                      <p
+                        style={{ fontFamily: "var(--font-sans)" }}
+                        className="text-[10px] uppercase tracking-[0.1em] text-[--color-taupe] mb-1.5"
+                      >
                         Flavor Profile
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {aiData.flavorTags.map((tag, i) => (
                           <motion.span
                             key={i}
-                            initial={{ opacity: 0, scale: 0.85 }}
+                            initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: i * 0.06 }}
-                            className="text-xs px-2.5 py-1 bg-secondary/30 rounded-full border border-border text-foreground"
+                            style={{ fontFamily: "var(--font-sans)" }}
+                            className="text-[11px] px-2 py-0.5 border border-[--color-border] text-[--color-ink] uppercase tracking-[0.08em]"
                           >
                             {tag.emoji} {tag.label}
                           </motion.span>
@@ -310,49 +318,55 @@ export default function ProductCard({
                     </div>
 
                     {/* Pairs with */}
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      <span className="font-medium text-foreground">Pairs well with</span>{" "}
-                      {aiData.pairsWith}
+                    <p
+                      style={{ fontFamily: "var(--font-serif)" }}
+                      className="text-sm italic text-[--color-ink] leading-relaxed"
+                    >
+                      Pairs well with {aiData.pairsWith}
                       {isStreaming && (
-                        <span className="inline-block w-1 h-3 bg-primary/60 rounded-sm ml-0.5 animate-pulse" />
+                        <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 animate-pulse" />
                       )}
                     </p>
 
                     {/* Best for */}
-                    <p className="text-xs leading-relaxed">
-                      <span className="font-medium text-foreground">Perfect for:</span>{" "}
-                      <span className="text-primary">{aiData.bestFor}</span>
+                    <p
+                      style={{ fontFamily: "var(--font-sans)" }}
+                      className="text-[11px] text-[--color-taupe] leading-relaxed"
+                    >
+                      {aiData.bestFor}
                       {isStreaming && (
-                        <span className="inline-block w-1 h-3 bg-primary/60 rounded-sm ml-0.5 animate-pulse" />
+                        <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 animate-pulse" />
                       )}
                     </p>
 
-                    {/* Partial error */}
                     {streamError && (
-                      <p className="text-[10px] text-muted-foreground/70">
+                      <p className="text-[10px] text-[--color-taupe] italic">
                         — {streamError}{" "}
                         <button
                           onClick={e => { e.stopPropagation(); cache.current = null; fetchAI(); }}
-                          className="text-primary hover:underline"
+                          className="underline hover:no-underline"
                         >
                           Try again?
                         </button>
                       </p>
                     )}
 
-                    {/* AI-generated label */}
-                    <p className="text-[10px] italic text-muted-foreground/50">AI-generated</p>
+                    <p
+                      style={{ fontFamily: "var(--font-sans)" }}
+                      className="text-[10px] italic text-[--color-taupe]"
+                    >
+                      AI-generated
+                    </p>
                   </motion.div>
                 )}
 
-                {/* Full error (no data at all) */}
                 {!aiData && streamError && (
                   <div className="py-2">
-                    <p className="text-xs text-muted-foreground">
+                    <p style={{ fontFamily: "var(--font-sans)" }} className="text-xs text-[--color-taupe]">
                       Couldn't load flavor notes.{" "}
                       <button
                         onClick={e => { e.stopPropagation(); cache.current = null; fetchAI(); }}
-                        className="text-primary hover:underline"
+                        className="underline hover:no-underline"
                       >
                         Try again?
                       </button>
@@ -364,24 +378,26 @@ export default function ProductCard({
           )}
         </AnimatePresence>
 
-        {/* ── Footer actions ──────────────────────────────────────────────── */}
+        {/* ── Footer actions ────────────────────────────────────────── */}
         <div className="mt-auto pt-2 flex flex-col gap-1.5">
           <button
             onClick={handleAddToCart}
-            className={`w-full border border-border rounded-full hover:bg-foreground hover:text-background transition-colors flex items-center justify-center gap-2 font-medium active:scale-95 duration-200 cursor-pointer ${
-              compact ? "py-2 text-xs" : "py-3"
+            style={{ fontFamily: "var(--font-sans)" }}
+            className={`w-full border border-[--color-ink] bg-[--color-ink] text-[--color-cream] uppercase tracking-[0.12em] font-medium transition-all duration-300 hover:bg-[--color-cream] hover:text-[--color-ink] flex items-center justify-center gap-2 active:scale-95 cursor-pointer ${
+              compact ? "py-2 text-[10px]" : "py-2.5 text-xs"
             }`}
           >
-            <ShoppingBag size={compact ? 14 : 18} /> Add to Cart
+            <ShoppingBag size={compact ? 12 : 14} /> Add to Cart
           </button>
 
           <button
             onClick={toggleExpand}
-            className={`w-full flex items-center justify-center gap-1.5 text-primary/70 hover:text-primary transition-colors ${
-              compact ? "py-1 text-[11px]" : "py-1.5 text-xs"
+            style={{ fontFamily: "var(--font-sans)" }}
+            className={`w-full flex items-center justify-center gap-1.5 text-[--color-taupe] hover:text-[--color-ink] transition-colors duration-300 ${
+              compact ? "py-1 text-[10px]" : "py-1 text-xs"
             }`}
           >
-            <Sparkles size={compact ? 11 : 12} />
+            <Sparkles size={compact ? 10 : 11} />
             {isExpanded ? "Collapse" : "✦ Explore flavors"}
           </button>
         </div>

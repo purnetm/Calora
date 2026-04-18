@@ -11,7 +11,7 @@ import { getTasteProfile } from "./TasteProfileModal";
 export interface SearchState {
   results: (Product & { category: string })[] | null;
   query: string;
-  isFallback: boolean; // true = no exact match, showing similar products
+  isFallback: boolean;
 }
 
 interface Props {
@@ -58,12 +58,9 @@ function buildSystemPrompt(): string {
 
 function localSearch(query: string): (Product & { category: string })[] {
   const q = query.toLowerCase();
-
-  // Price filter: "under ₹X", "under X", "below X"
   const priceMatch = q.match(/(?:under|below|less than)\s*[₹]?\s*(\d+)/);
   const maxPrice = priceMatch ? parseInt(priceMatch[1]) : Infinity;
 
-  // Keyword synonyms
   const synonyms: Record<string, string[]> = {
     chocolate: ["choc", "cocoa", "brownie", "velvet", "fudge"],
     vegan: ["plant", "dairy-free"],
@@ -76,7 +73,6 @@ function localSearch(query: string): (Product & { category: string })[] {
     macaron: ["macaron", "french"],
   };
 
-  // Expand query with synonyms
   const expand = (k: string) =>
     Object.entries(synonyms).find(([key, vals]) =>
       key === k || vals.some(v => k.includes(v))
@@ -102,7 +98,6 @@ function localSearch(query: string): (Product & { category: string })[] {
     .sort((a, b) => b.score - a.score)
     .map(({ p }) => p);
 
-  // If nothing matched by keyword but price filter exists, return cheapest
   if (scored.length === 0 && maxPrice < Infinity) {
     return ALL_PRODUCTS
       .filter(p => p.price <= maxPrice)
@@ -113,7 +108,7 @@ function localSearch(query: string): (Product & { category: string })[] {
   return scored.slice(0, 8);
 }
 
-// ─── Fallback product picker (for empty AI results) ──────────────────────────
+// ─── Fallback product picker ──────────────────────────────────────────────────
 
 function getFallback(): (Product & { category: string })[] {
   const profile = getTasteProfile();
@@ -157,14 +152,12 @@ export default function SmartSearch({ onChange }: Props) {
           { system: buildSystemPrompt(), maxTokens: 256 }
         );
 
-        // Extract JSON array from response (Claude sometimes adds prose)
         const match = raw.match(/\[[\s\S]*?\]/);
         if (!match) throw new Error("Unexpected response format");
 
         const ids: string[] = JSON.parse(match[0]);
         const productMap = new Map(ALL_PRODUCTS.map(p => [p.id, p]));
 
-        // Silently filter out any IDs that don't exist in the catalog
         const matched = ids
           .filter(id => productMap.has(id))
           .map(id => productMap.get(id)!);
@@ -178,7 +171,6 @@ export default function SmartSearch({ onChange }: Props) {
           setResultMeta({ count: matched.length, isFallback: false });
         }
       } catch {
-        // API unavailable — fall back to local keyword search silently
         const local = localSearch(trimmed);
         if (local.length > 0) {
           onChange({ results: local, query: trimmed, isFallback: false });
@@ -218,14 +210,14 @@ export default function SmartSearch({ onChange }: Props) {
       {/* Input */}
       <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto">
         <div
-          className={`flex items-center rounded-full border bg-white transition-all duration-300 ${
+          className={`flex items-center border-b bg-transparent transition-all duration-300 ${
             isLoading
-              ? "border-primary/50 shadow-[0_0_0_3px_rgba(149,117,205,0.12)] animate-pulse"
-              : "border-border hover:border-primary/40 focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(149,117,205,0.12)]"
+              ? "border-[--color-taupe]"
+              : "border-[--color-ink] focus-within:border-[--color-ink]"
           }`}
         >
-          <span className={`pl-4 text-primary shrink-0 ${isLoading ? "animate-spin" : ""}`}>
-            <Sparkles size={17} />
+          <span className={`pr-3 text-[--color-taupe] shrink-0 ${isLoading ? "animate-spin" : ""}`}>
+            <Sparkles size={15} />
           </span>
           <input
             ref={inputRef}
@@ -233,29 +225,31 @@ export default function SmartSearch({ onChange }: Props) {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Try 'chocolate under ₹400' or 'something vegan and fruity'…"
-            className="flex-1 px-3 py-3 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"
+            style={{ fontFamily: "var(--font-sans)" }}
+            className="flex-1 py-3 bg-transparent outline-none text-sm text-[--color-ink] placeholder:text-[--color-taupe] font-light tracking-[0.02em]"
           />
           {query && (
             <button
               type="button"
               onClick={handleClear}
-              className="pr-4 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+              className="pl-3 text-[--color-taupe] hover:text-[--color-ink] transition-colors shrink-0"
               aria-label="Clear search"
             >
-              <X size={15} />
+              <X size={14} />
             </button>
           )}
         </div>
       </form>
 
-      {/* Suggestion chips — only visible when input is empty */}
+      {/* Suggestion chips */}
       {!query && (
         <div className="flex flex-wrap gap-2 justify-center max-w-xl mx-auto">
           {CHIPS.map(chip => (
             <button
               key={chip}
               onClick={() => handleChip(chip)}
-              className="px-3 py-1.5 rounded-full bg-white border border-border text-xs font-medium text-muted-foreground hover:border-primary/60 hover:text-foreground transition-all duration-150"
+              style={{ fontFamily: "var(--font-sans)" }}
+              className="px-3 py-1.5 border border-[--color-border] text-[11px] font-sans uppercase tracking-[0.1em] text-[--color-taupe] hover:border-[--color-ink] hover:text-[--color-ink] transition-all duration-150 cursor-pointer"
             >
               {chip}
             </button>
@@ -265,46 +259,56 @@ export default function SmartSearch({ onChange }: Props) {
 
       {/* Error */}
       {error && (
-        <p className="text-center text-sm text-muted-foreground max-w-xl mx-auto">
+        <p
+          style={{ fontFamily: "var(--font-sans)" }}
+          className="text-center text-xs text-[--color-taupe] max-w-xl mx-auto"
+        >
           {error}{" "}
           <button
             onClick={() => doSearch(query)}
-            className="text-primary underline underline-offset-2 hover:no-underline"
+            className="underline underline-offset-2 hover:no-underline"
           >
             Retry
           </button>
         </p>
       )}
 
-      {/* Results meta row */}
+      {/* Results meta */}
       {resultMeta && !error && (
         <div className="flex items-center justify-center gap-1.5 max-w-xl mx-auto">
           {resultMeta.isFallback ? (
-            <p className="text-sm text-muted-foreground text-center">
+            <p
+              style={{ fontFamily: "var(--font-sans)" }}
+              className="text-xs text-[--color-taupe] text-center uppercase tracking-[0.14em]"
+            >
               No exact matches — here are some you might like anyway
             </p>
           ) : (
             <>
-              <span className="text-xs text-muted-foreground">
+              <span
+                style={{ fontFamily: "var(--font-sans)" }}
+                className="text-xs text-[--color-taupe] uppercase tracking-[0.14em]"
+              >
                 {resultMeta.count} result{resultMeta.count !== 1 ? "s" : ""} found
               </span>
               <Tooltip.Provider delayDuration={200}>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <button
-                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-[--color-taupe] hover:text-[--color-ink] transition-colors"
                       aria-label="Why these results?"
                     >
-                      <Info size={13} />
+                      <Info size={12} />
                     </button>
                   </Tooltip.Trigger>
                   <Tooltip.Portal>
                     <Tooltip.Content
-                      className="z-50 bg-foreground text-background text-xs px-3 py-2 rounded-lg max-w-[220px] leading-relaxed"
+                      style={{ fontFamily: "var(--font-sans)" }}
+                      className="z-50 bg-[--color-ink] text-[--color-cream] text-xs px-3 py-2 max-w-[220px] leading-relaxed"
                       sideOffset={5}
                     >
                       Results are matched by our AI based on your query and taste profile.
-                      <Tooltip.Arrow className="fill-foreground" />
+                      <Tooltip.Arrow className="fill-[--color-ink]" />
                     </Tooltip.Content>
                   </Tooltip.Portal>
                 </Tooltip.Root>

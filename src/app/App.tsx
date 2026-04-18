@@ -30,9 +30,7 @@ function Home({ onOpenModal }: { onOpenModal: () => void }) {
 
   return (
     <div className="flex flex-col">
-      <div className="w-full max-w-[1440px] mx-auto p-4 lg:p-8">
-        <DonutLanding onOpenModal={onOpenModal} />
-      </div>
+      <DonutLanding onOpenModal={onOpenModal} />
       <DonutSections onOpenModal={onOpenModal} />
     </div>
   );
@@ -57,8 +55,8 @@ export default function App() {
     <CartProvider>
       <BrowserRouter>
         <ScrollToTop />
-        <div className="min-h-screen w-full bg-[#fafafa] flex flex-col font-sans text-[#212121]">
-          <Navbar onOpenModal={() => setIsModalOpen(true)} />
+        <div className="min-h-screen w-full bg-[--color-cream] flex flex-col text-[--color-ink]">
+          <Navbar />
           <Routes>
             <Route path="/" element={<Home onOpenModal={() => setIsModalOpen(true)} />} />
             <Route path="/shop" element={<ShopPage />} />
