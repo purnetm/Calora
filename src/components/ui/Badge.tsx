@@ -2,10 +2,8 @@ import React from "react";
 
 type BadgeVariant = "default" | "accent" | "muted";
 
-interface BadgeProps {
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
-  className?: string;
-  children: React.ReactNode;
 }
 
 const variantStyles: Record<BadgeVariant, React.CSSProperties> = {
@@ -22,7 +20,7 @@ const variantStyles: Record<BadgeVariant, React.CSSProperties> = {
   muted: {
     background: "transparent",
     color: "var(--color-taupe)",
-    padding: "0.125rem 0.5rem",
+    padding: "0.125rem 0.75rem",
   },
 };
 
@@ -30,6 +28,7 @@ export default function Badge({
   variant = "default",
   className = "",
   children,
+  ...props
 }: BadgeProps) {
   return (
     <span
@@ -38,6 +37,7 @@ export default function Badge({
         fontFamily: "var(--font-sans)",
         ...variantStyles[variant],
       }}
+      {...props}
     >
       {children}
     </span>

@@ -10,6 +10,19 @@ interface SectionHeaderProps {
   className?: string;
 }
 
+const navBtnStyle: React.CSSProperties = {
+  width: 40,
+  height: 40,
+  borderRadius: "var(--radius-full)",
+  border: "1px solid var(--color-ink)",
+  background: "transparent",
+  color: "var(--color-ink)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "1rem",
+};
+
 export default function SectionHeader({
   eyebrow,
   headline,
@@ -55,38 +68,18 @@ export default function SectionHeader({
             <button
               onClick={onPrev}
               aria-label="Previous"
-              className="transition-all duration-200 hover:[background:var(--color-ink)] hover:[color:var(--color-cream)] cursor-pointer"
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                border: "1px solid var(--color-ink)",
-                background: "transparent",
-                color: "var(--color-ink)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "1rem",
-              }}
+              disabled={!onPrev}
+              className="transition-all duration-200 hover:bg-[--color-ink] hover:text-[--color-cream] cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
+              style={navBtnStyle}
             >
               ←
             </button>
             <button
               onClick={onNext}
               aria-label="Next"
-              className="transition-all duration-200 hover:[background:var(--color-ink)] hover:[color:var(--color-cream)] cursor-pointer"
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                border: "1px solid var(--color-ink)",
-                background: "transparent",
-                color: "var(--color-ink)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "1rem",
-              }}
+              disabled={!onNext}
+              className="transition-all duration-200 hover:bg-[--color-ink] hover:text-[--color-cream] cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
+              style={navBtnStyle}
             >
               →
             </button>

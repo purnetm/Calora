@@ -7,7 +7,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   arrow?: boolean;
-  className?: string;
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -50,7 +49,7 @@ export default function Button({
   const hoverClasses: Record<ButtonVariant, string> = {
     primary: "hover:opacity-90",
     outline:
-      "hover:[background:var(--color-ink)] hover:[color:var(--color-cream)]",
+      "hover:bg-[--color-ink] hover:text-[--color-cream]",
     ghost: "hover:[color:var(--color-ink)]",
   };
 
@@ -65,7 +64,7 @@ export default function Button({
       {...props}
     >
       {children}
-      {arrow && <span className="ml-1">{" →"}</span>}
+      {arrow && <span className="ml-1" aria-hidden="true">→</span>}
     </button>
   );
 }
