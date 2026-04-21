@@ -63,15 +63,15 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
 
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="relative bg-[--color-ivory] border border-[--color-border] w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row overflow-hidden"
+            initial={{ opacity: 0, y: 12, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.97 }}
+            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+            className="relative bg-[--color-ivory] border border-[--color-border] rounded-[--radius-lg] [box-shadow:var(--shadow-lg)] w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row overflow-hidden"
           >
             <button
               onClick={onClose}
@@ -145,7 +145,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
                 <button
                   type="submit"
                   style={{ fontFamily: "var(--font-sans)" }}
-                  className="w-full bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.14em] font-medium py-3 mt-2 border border-[--color-ink] hover:bg-[--color-cream] hover:text-[--color-ink] transition-all duration-300 cursor-pointer"
+                  className="w-full bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.14em] font-medium py-3 mt-2 border border-[--color-ink] hover:bg-[--color-cream] hover:text-[--color-ink] transition-[background-color,color,border-color] duration-200 cursor-pointer active:scale-[0.97] rounded-[--radius-sm]"
                 >
                   Confirm Subscription
                 </button>
@@ -173,12 +173,12 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
                 <Slider {...settings}>
                   {RECOMMENDED_ITEMS.map((item) => (
                     <div key={item.id} className="px-2 outline-none">
-                      <div className="bg-[--color-cream] border border-[--color-border] overflow-hidden group">
+                      <div className="bg-[--color-cream] border border-[--color-border] rounded-[--radius-sm] overflow-hidden group">
                         <div className="aspect-square relative overflow-hidden">
                           <img
                             src={item.image}
                             alt={item.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
                         <div className="p-3 text-center">

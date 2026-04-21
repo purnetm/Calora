@@ -49,7 +49,7 @@ export default function DonutLanding({ onOpenModal }: { onOpenModal?: () => void
             <button
               onClick={onOpenModal}
               style={{ fontFamily: "var(--font-sans)" }}
-              className="bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.14em] font-medium py-3 px-6 border border-[--color-ink] transition-all duration-300 hover:bg-[--color-cream] hover:text-[--color-ink] cursor-pointer"
+              className="bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.14em] font-medium py-3 px-6 border border-[--color-ink] transition-[background-color,color] duration-200 hover:bg-[--color-cream] hover:text-[--color-ink] active:scale-[0.97] rounded-[--radius-sm] cursor-pointer"
             >
               Explore the Menu
             </button>

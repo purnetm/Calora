@@ -218,17 +218,17 @@ export default function ProductCard({
   return (
     <motion.div
       layout
-      transition={{ layout: { duration: 0.3, ease: "easeInOut" } }}
-      className={`bg-[--color-card] border border-[--color-border] overflow-hidden flex flex-col group transition-all duration-300 hover:border-[--color-ink] hover:-translate-y-0.5 ${
+      transition={{ layout: { duration: 0.25, ease: [0.23, 1, 0.32, 1] } }}
+      className={`bg-[--color-card] border border-[--color-border] rounded-[--radius] overflow-hidden flex flex-col group [box-shadow:var(--shadow-sm)] [transition:border-color_200ms,box-shadow_200ms,transform_200ms] hover:border-[--color-ink] hover:-translate-y-0.5 hover:[box-shadow:var(--shadow)] ${
         compact ? "text-sm" : ""
-      } ${isExpanded ? "border-[--color-ink]" : ""}`}
+      } ${isExpanded ? "border-[--color-ink] [box-shadow:var(--shadow)]" : ""}`}
     >
       {/* Image */}
       <div className={`relative overflow-hidden border-b border-[--color-border] ${compact ? "aspect-[4/3]" : "aspect-square"}`}>
         <img
           src={image}
           alt={name}
-          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
         />
         <div
           className={`absolute bg-[--color-cream]/80 backdrop-blur-sm border border-[--color-border] flex items-center justify-center ${
@@ -309,7 +309,7 @@ export default function ProductCard({
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: i * 0.06 }}
                             style={{ fontFamily: "var(--font-sans)" }}
-                            className="text-[11px] px-2 py-0.5 border border-[--color-border] text-[--color-ink] uppercase tracking-[0.08em]"
+                            className="text-[11px] px-2.5 py-0.5 border border-[--color-border] rounded-full text-[--color-ink] uppercase tracking-[0.08em]"
                           >
                             {tag.emoji} {tag.label}
                           </motion.span>
@@ -383,7 +383,7 @@ export default function ProductCard({
           <button
             onClick={handleAddToCart}
             style={{ fontFamily: "var(--font-sans)" }}
-            className={`w-full border border-[--color-ink] bg-[--color-ink] text-[--color-cream] uppercase tracking-[0.12em] font-medium transition-all duration-300 hover:bg-[--color-cream] hover:text-[--color-ink] flex items-center justify-center gap-2 active:scale-95 cursor-pointer ${
+            className={`w-full border border-[--color-ink] bg-[--color-ink] text-[--color-cream] uppercase tracking-[0.12em] font-medium transition-[background-color,color] duration-200 hover:bg-[--color-cream] hover:text-[--color-ink] flex items-center justify-center gap-2 active:scale-[0.97] cursor-pointer rounded-[--radius-sm] ${
               compact ? "py-2 text-[10px]" : "py-2.5 text-xs"
             }`}
           >
@@ -393,7 +393,7 @@ export default function ProductCard({
           <button
             onClick={toggleExpand}
             style={{ fontFamily: "var(--font-sans)" }}
-            className={`w-full flex items-center justify-center gap-1.5 text-[--color-taupe] hover:text-[--color-ink] transition-colors duration-300 ${
+            className={`w-full flex items-center justify-center gap-1.5 text-[--color-taupe] hover:text-[--color-ink] transition-colors duration-200 active:scale-[0.97] rounded-[--radius-sm] ${
               compact ? "py-1 text-[10px]" : "py-1 text-xs"
             }`}
           >
