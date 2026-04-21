@@ -1,89 +1,190 @@
 import React from "react";
+import Button from "@/components/ui/Button";
+import { ALL_PRODUCTS } from "@/app/data/products";
 
-const imgHero = "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=900&q=80";
+const imgHero =
+  "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=900&q=80";
 
-const MARQUEE_TEXT =
-  "HANDCRAFTED DAILY  ·  NO ARTIFICIAL PRESERVATIVES  ·  AI-PERSONALISED FOR YOU  ·  SAME-DAY DELIVERY  ·  GOURMET INGREDIENTS  ·  ";
+// Use first 3 products for chips, falling back to hardcoded data
+const CHIP_PRODUCTS = ALL_PRODUCTS.slice(0, 3).length >= 3
+  ? ALL_PRODUCTS.slice(0, 3).map((p) => ({
+      name: p.name,
+      price: `₹${p.price}`,
+      image: p.image,
+      bg: "",
+    }))
+  : [
+      { name: "Pistachio Cream", price: "₹180", image: "", bg: "" },
+      { name: "Rose Petal", price: "₹160", image: "", bg: "" },
+      { name: "Classic Glazed", price: "₹140", image: "", bg: "" },
+    ];
 
-export default function DonutLanding({ onOpenModal }: { onOpenModal?: () => void }) {
+const CHIP_BG_COLORS = [
+  "var(--color-pistachio)",
+  "var(--color-rose)",
+  "var(--color-bone)",
+];
+
+const MARQUEE_SEGMENT =
+  "✦ Made Fresh Daily   ·   ✦ Handcrafted Flavours   ·   ✦ Made Fresh Daily   ·   ✦ Handcrafted Flavours   ·   ✦ Made Fresh Daily   ·   ✦ Handcrafted Flavours   ·   ";
+
+export default function DonutLanding({
+  onOpenModal,
+}: {
+  onOpenModal?: () => void;
+}) {
   return (
-    <div className="w-full bg-[--color-cream]">
-      {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <div className="max-w-[1440px] mx-auto px-4 md:px-8 pt-24 lg:pt-40 pb-16 lg:pb-24 flex flex-col lg:flex-row gap-12 lg:gap-0 items-start">
-        {/* Left 55%: editorial copy */}
-        <div className="w-full lg:w-[55%] flex flex-col gap-8 lg:pr-16">
+    <div className="w-full" style={{ background: "var(--color-cream)" }}>
+      {/* ── Hero grid ─────────────────────────────────────────────────── */}
+      <section
+        className="max-w-7xl mx-auto px-6 pt-16 grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-10 lg:gap-0 items-center"
+        style={{ minHeight: "90vh" }}
+      >
+        {/* Left column — editorial copy */}
+        <div className="flex flex-col lg:pr-16">
           {/* Eyebrow */}
           <p
-            style={{ fontFamily: "var(--font-sans)" }}
-            className="text-xs uppercase tracking-[0.18em] text-[--color-taupe]"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "11px",
+              color: "var(--color-gold)",
+              letterSpacing: "0.15em",
+            }}
+            className="uppercase"
           >
-            Artisan · Gourmet · AI-Curated
+            [PREMIUM PATISSERIE]
           </p>
 
           {/* Headline */}
-          <div>
+          <div className="mt-5">
             <h1
-              style={{ fontFamily: "var(--font-display)" }}
-              className="text-5xl lg:text-7xl font-light tracking-[-0.01em] leading-[1.1] text-[--color-ink]"
+              style={{
+                fontFamily: "var(--font-display)",
+                lineHeight: 1.05,
+              }}
+              className="text-5xl lg:text-7xl font-light tracking-[-0.01em] text-[--color-ink]"
             >
               Where every bite
             </h1>
             <h1
-              style={{ fontFamily: "var(--font-serif)" }}
-              className="text-5xl lg:text-7xl font-light tracking-[-0.01em] leading-[1.1] text-[--color-ink] italic"
+              style={{
+                fontFamily: "var(--font-serif)",
+                lineHeight: 1.05,
+              }}
+              className="text-5xl lg:text-7xl font-light tracking-[-0.01em] text-[--color-ink] italic"
             >
               is a choice.
             </h1>
           </div>
 
-          {/* Subheading */}
-          <p
-            style={{ fontFamily: "var(--font-sans)" }}
-            className="text-sm font-light text-[--color-taupe] max-w-sm leading-relaxed"
-          >
-            Premium desserts, personalised for you by AI.
-          </p>
+          {/* Flavor chips */}
+          <div className="flex gap-3 mt-6 flex-wrap">
+            {CHIP_PRODUCTS.map((chip, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 px-3 py-2"
+                style={{
+                  background: CHIP_BG_COLORS[i],
+                  borderRadius: "var(--radius-base, 14px)",
+                }}
+              >
+                {/* Small circular image */}
+                {chip.image ? (
+                  <img
+                    src={chip.image}
+                    alt={chip.name}
+                    className="rounded-full object-cover flex-shrink-0"
+                    style={{ width: 40, height: 40 }}
+                  />
+                ) : (
+                  <div
+                    className="rounded-full flex-shrink-0"
+                    style={{
+                      width: 40,
+                      height: 40,
+                      background: "var(--color-taupe)",
+                      opacity: 0.4,
+                    }}
+                  />
+                )}
+                {/* Name + price */}
+                <div className="flex flex-col">
+                  <span
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "13px",
+                      color: "var(--color-ink)",
+                    }}
+                  >
+                    {chip.name}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "12px",
+                      color: "var(--color-gold)",
+                    }}
+                  >
+                    {chip.price}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
 
-          {/* CTA row */}
-          <div className="flex items-center gap-6 flex-wrap">
-            <button
+          {/* CTA buttons */}
+          <div className="flex gap-4 mt-8 flex-wrap items-center">
+            <Button
+              variant="primary"
+              size="lg"
               onClick={onOpenModal}
-              style={{ fontFamily: "var(--font-sans)" }}
-              className="bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.14em] font-medium py-3 px-6 border border-[--color-ink] transition-[background-color,color] duration-200 hover:bg-[--color-cream] hover:text-[--color-ink] active:scale-[0.97] rounded-[--radius-sm] cursor-pointer"
             >
-              Explore the Menu
-            </button>
-            <button
+              Book Your Event
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              arrow
               onClick={onOpenModal}
-              style={{ fontFamily: "var(--font-sans)" }}
-              className="text-xs uppercase tracking-[0.14em] font-medium text-[--color-ink] hover:text-[--color-taupe] transition-colors duration-300 cursor-pointer"
             >
-              Set Your Taste Profile →
-            </button>
+              Explore Our Menu
+            </Button>
           </div>
         </div>
 
-        {/* Right 45%: editorial photograph */}
-        <div className="w-full lg:w-[45%] overflow-hidden h-[480px] lg:h-[600px] shrink-0">
+        {/* Right column — hero image */}
+        <div className="overflow-hidden h-[480px] lg:h-[600px]">
           <img
             src={imgHero}
             alt="Gourmet dessert"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </div>
-      </div>
+      </section>
 
       {/* ── Marquee strip ─────────────────────────────────────────────── */}
-      <div className="w-full bg-[--color-espresso] overflow-hidden py-3">
+      <div
+        className="w-full overflow-hidden py-3"
+        style={{ background: "var(--color-pistachio)" }}
+      >
         <div
-          className="flex whitespace-nowrap"
-          style={{ animation: "marquee 30s linear infinite" }}
+          style={{
+            display: "flex",
+            whiteSpace: "nowrap",
+            animation: "marquee 28s linear infinite",
+          }}
         >
           <span
-            style={{ fontFamily: "var(--font-sans)" }}
-            className="text-[11px] uppercase tracking-[0.16em] text-[--color-cream] pr-0"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "12px",
+              color: "var(--color-ink)",
+              letterSpacing: "0.05em",
+              whiteSpace: "nowrap",
+            }}
           >
-            {MARQUEE_TEXT}{MARQUEE_TEXT}
+            {MARQUEE_SEGMENT}
+            {MARQUEE_SEGMENT}
           </span>
         </div>
       </div>
