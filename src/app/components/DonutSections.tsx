@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "motion/react";
+import { Link } from "react-router-dom";
 import { Button, SectionHeader } from "@/components/ui";
 import ProductCard from "./ProductCard";
 
@@ -74,6 +75,11 @@ const GALLERY_PHOTOS = [
   "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&q=80",
   "https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=400&q=80",
 ];
+
+// ── Per-page constants ─────────────────────────────────────────────────────
+
+const PRODUCTS_PER_PAGE = 3;
+const TESTIMONIALS_PER_PAGE = 3;
 
 // ── Testimonials data ──────────────────────────────────────────────────────
 
@@ -296,10 +302,10 @@ function PricingCard({ plan, onSelect }: PricingCardProps) {
   const nameColor = recommended ? "var(--color-cream)" : "var(--color-ink)";
   const priceColor = recommended ? "var(--color-cream)" : "var(--color-ink)";
   const subColor = recommended
-    ? "rgba(251, 247, 240, 0.7)"
+    ? "rgba(251, 247, 240, 0.7)" /* --color-cream with opacity */
     : "var(--color-taupe)";
   const featureColor = recommended
-    ? "rgba(251, 247, 240, 0.85)"
+    ? "rgba(251, 247, 240, 0.85)" /* --color-cream with opacity */
     : "var(--color-ink)";
   const checkColor = recommended
     ? "var(--color-pistachio)"
@@ -347,9 +353,9 @@ function PricingCard({ plan, onSelect }: PricingCardProps) {
 
       {/* Features */}
       <ul className="flex flex-col gap-2.5 flex-grow">
-        {features.map((f, i) => (
+        {features.map((f) => (
           <li
-            key={i}
+            key={f}
             style={{
               fontFamily: "var(--font-sans)",
               fontSize: 14,
@@ -398,36 +404,29 @@ export default function DonutSections({
 }) {
   // Featured products pager: 3 at a time
   const [featuredPage, setFeaturedPage] = useState(0);
-  const productsPerPage = 3;
   const totalFeaturedPages = Math.max(
     1,
-    Math.ceil(FEATURED_PRODUCTS.length / productsPerPage)
+    Math.ceil(FEATURED_PRODUCTS.length / PRODUCTS_PER_PAGE)
   );
-  const visibleProducts = (() => {
-    const start = (featuredPage * productsPerPage) % FEATURED_PRODUCTS.length;
-    const items: typeof FEATURED_PRODUCTS = [];
-    for (let i = 0; i < productsPerPage; i++) {
-      items.push(FEATURED_PRODUCTS[(start + i) % FEATURED_PRODUCTS.length]);
-    }
-    return items;
-  })();
+  const visibleProducts = useMemo(() => {
+    const start = (featuredPage * PRODUCTS_PER_PAGE) % FEATURED_PRODUCTS.length;
+    return Array.from({ length: PRODUCTS_PER_PAGE }, (_, i) =>
+      FEATURED_PRODUCTS[(start + i) % FEATURED_PRODUCTS.length]
+    );
+  }, [featuredPage]);
 
   // Testimonial pager: 3 at a time
   const [testimonialPage, setTestimonialPage] = useState(0);
-  const testimonialsPerPage = 3;
   const totalTestimonialPages = Math.max(
     1,
-    Math.ceil(TESTIMONIALS.length / testimonialsPerPage)
+    Math.ceil(TESTIMONIALS.length / TESTIMONIALS_PER_PAGE)
   );
-  const visibleTestimonials = (() => {
-    const start =
-      (testimonialPage * testimonialsPerPage) % TESTIMONIALS.length;
-    const items: Testimonial[] = [];
-    for (let i = 0; i < testimonialsPerPage; i++) {
-      items.push(TESTIMONIALS[(start + i) % TESTIMONIALS.length]);
-    }
-    return items;
-  })();
+  const visibleTestimonials = useMemo(() => {
+    const start = (testimonialPage * TESTIMONIALS_PER_PAGE) % TESTIMONIALS.length;
+    return Array.from({ length: TESTIMONIALS_PER_PAGE }, (_, i) =>
+      TESTIMONIALS[(start + i) % TESTIMONIALS.length]
+    );
+  }, [testimonialPage]);
 
   return (
     <div className="flex flex-col w-full">
@@ -537,7 +536,7 @@ export default function DonutSections({
                   <div className="flex -space-x-2">
                     {[0, 1, 2].map((i) => (
                       <div
-                        key={i}
+                        key={"avatar-" + i}
                         style={{
                           width: 28,
                           height: 28,
@@ -845,8 +844,8 @@ export default function DonutSections({
             transition={{ duration: 0.35 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6"
           >
-            {visibleTestimonials.map((t, i) => (
-              <TestimonialCard key={`${testimonialPage}-${i}`} {...t} />
+            {visibleTestimonials.map((t) => (
+              <TestimonialCard key={t.author} {...t} />
             ))}
           </motion.div>
         </div>
@@ -903,7 +902,7 @@ export default function DonutSections({
                 style={{
                   fontFamily: "var(--font-sans)",
                   fontSize: 15,
-                  color: "rgba(251, 247, 240, 0.75)",
+                  color: "rgba(251, 247, 240, 0.75)", /* --color-cream with opacity */
                   fontWeight: 300,
                   lineHeight: 1.6,
                   maxWidth: "34rem",
@@ -992,19 +991,42 @@ export default function DonutSections({
                 Quick Links
               </h4>
               <ul className="flex flex-col gap-2">
-                {["Home", "Shop", "About", "Subscription"].map((l) => (
-                  <li
-                    key={l}
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: 13,
-                      color: "var(--color-taupe)",
-                    }}
-                    className="hover:text-[--color-ink] transition-colors duration-200 cursor-pointer"
+                <li>
+                  <Link
+                    to="/"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
                   >
-                    {l}
-                  </li>
-                ))}
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/shop"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
+                  >
+                    Shop
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/about"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
+                  >
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="#subscription"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
+                  >
+                    Subscription
+                  </a>
+                </li>
               </ul>
             </div>
 
@@ -1023,19 +1045,33 @@ export default function DonutSections({
                 Support
               </h4>
               <ul className="flex flex-col gap-2">
-                {["Contact", "FAQ", "Delivery Info"].map((l) => (
-                  <li
-                    key={l}
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: 13,
-                      color: "var(--color-taupe)",
-                    }}
-                    className="hover:text-[--color-ink] transition-colors duration-200 cursor-pointer"
+                <li>
+                  <a
+                    href="#"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
                   >
-                    {l}
-                  </li>
-                ))}
+                    Contact
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
+                  >
+                    FAQ
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
+                  >
+                    Delivery Info
+                  </a>
+                </li>
               </ul>
             </div>
 
@@ -1054,19 +1090,39 @@ export default function DonutSections({
                 Follow Us
               </h4>
               <ul className="flex flex-col gap-2">
-                {["Instagram", "Twitter", "Pinterest"].map((l) => (
-                  <li
-                    key={l}
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: 13,
-                      color: "var(--color-taupe)",
-                    }}
-                    className="hover:text-[--color-ink] transition-colors duration-200 cursor-pointer"
+                <li>
+                  <a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
                   >
-                    {l}
-                  </li>
-                ))}
+                    Instagram
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://twitter.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
+                  >
+                    Twitter
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://pinterest.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--color-taupe)" }}
+                    className="hover:text-[--color-ink] transition-colors duration-200"
+                  >
+                    Pinterest
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
