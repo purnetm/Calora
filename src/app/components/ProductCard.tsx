@@ -1,9 +1,10 @@
 // AI-POWERED (AI-generated flavor descriptions via streaming)
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { ShoppingBag, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useCart } from "../context/CartContext";
 import { streamClaude } from "../lib/anthropic";
+import { Button, Badge, Card } from "@/components/ui";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -145,6 +146,7 @@ export default function ProductCard({
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [aiData, setAiData] = useState<AIProductData | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   const cache = useRef<AIProductData | null>(null);
   const buffer = useRef("");
@@ -215,133 +217,154 @@ export default function ProductCard({
 
   const handleAddToCart = () => addToCart({ id, name, price, image, calories });
 
+  // Determine shadow based on hover state
+  const shadowStyle = isHovered ? "var(--shadow-lg)" : "var(--shadow)";
+
   return (
     <motion.div
       layout
       transition={{ layout: { duration: 0.25, ease: [0.23, 1, 0.32, 1] } }}
-      className={`bg-[--color-card] border border-[--color-border] rounded-[--radius] overflow-hidden flex flex-col group [box-shadow:var(--shadow-sm)] [transition:border-color_200ms,box-shadow_200ms,transform_200ms] hover:border-[--color-ink] hover:-translate-y-0.5 hover:[box-shadow:var(--shadow)] ${
-        compact ? "text-sm" : ""
-      } ${isExpanded ? "border-[--color-ink] [box-shadow:var(--shadow)]" : ""}`}
     >
-      {/* Image */}
-      <div className={`relative overflow-hidden border-b border-[--color-border] ${compact ? "aspect-[4/3]" : "aspect-square"}`}>
-        <img
-          src={image}
-          alt={name}
-          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-        />
-        <div
-          className={`absolute bg-[--color-cream]/80 backdrop-blur-sm border border-[--color-border] flex items-center justify-center ${
-            compact ? "top-2 right-2 px-2 py-0.5" : "top-3 right-3 px-2 py-0.5"
-          }`}
-        >
-          <span
-            style={{ fontFamily: "var(--font-sans)" }}
-            className="text-[10px] uppercase tracking-[0.1em] text-[--color-ink]"
-          >
-            {calories} cal
-          </span>
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className={`flex flex-col flex-grow ${compact ? "p-3 gap-2" : "p-5 gap-3"}`}>
-        {/* Name + price */}
-        <div className="flex justify-between items-start gap-2">
-          <button
-            onClick={toggleExpand}
-            style={{ fontFamily: "var(--font-serif)" }}
-            className={`font-normal text-[--color-ink] text-left hover:text-[--color-taupe] transition-colors duration-300 tracking-[-0.01em] ${
-              compact ? "text-sm leading-tight" : "text-base"
-            }`}
-          >
-            {name}
-          </button>
-          <span
-            style={{ fontFamily: "var(--font-serif)" }}
-            className="text-sm font-medium shrink-0 text-[--color-ink]"
-          >
-            ₹{price.toFixed(2)}
-          </span>
+      <Card
+        variant="default"
+        className="flex flex-col"
+        style={{
+          boxShadow: shadowStyle,
+          transition: "box-shadow 250ms var(--ease-out)",
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Image */}
+        <div className={`overflow-hidden w-full ${compact ? "aspect-[3/2]" : "aspect-[4/3]"}`}>
+          <img
+            src={image}
+            alt={name}
+            className="object-cover w-full h-full"
+          />
         </div>
 
-        <p
-          style={{ fontFamily: "var(--font-sans)" }}
-          className={`text-[--color-taupe] font-light line-clamp-2 ${compact ? "text-[11px]" : "text-xs"}`}
-        >
-          {description}
-        </p>
-
-        {/* ── AI expanded section ───────────────────────────────────── */}
-        <AnimatePresence>
-          {isExpanded && (
-            <motion.div
-              key="ai-section"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.28, ease: "easeInOut" }}
-              className="overflow-hidden"
+        {/* Body */}
+        <div className={`flex flex-col flex-grow ${compact ? "p-3" : "p-4"}`}>
+          {/* Name + price */}
+          <div className="flex items-start justify-between gap-2">
+            <span
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: compact ? "15px" : "18px",
+                color: "var(--color-ink)",
+                fontWeight: 400,
+              }}
             >
-              <div className="pt-3 mt-1 border-t border-[--color-border] bg-[--color-bone] -mx-3 px-3 pb-3">
-                {isStreaming && !aiData && <AISkeleton />}
+              {name}
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "14px",
+                color: "var(--color-gold)",
+                fontWeight: 500,
+              }}
+              className="whitespace-nowrap shrink-0"
+            >
+              ₹{price.toFixed(2)}
+            </span>
+          </div>
 
-                {aiData && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.25 }}
-                    className="flex flex-col gap-3 pt-1"
-                  >
-                    {/* Flavor tags */}
-                    <div>
+          {/* Flavor tags — shown when AI data available */}
+          {aiData && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {aiData.flavorTags.slice(0, 3).map((tag, i) => (
+                <Badge key={i} variant="accent">
+                  {tag.emoji} {tag.label}
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          {/* Description */}
+          {!compact && (
+            <p
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "14px",
+                color: "var(--color-taupe)",
+                lineHeight: 1.6,
+              }}
+              className={`mt-2 ${isExpanded ? "" : "line-clamp-2"}`}
+            >
+              {description}
+            </p>
+          )}
+
+          {/* ── AI expanded section ───────────────────────────────────── */}
+          <AnimatePresence>
+            {isExpanded && !compact && (
+              <motion.div
+                key="ai-section"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.28, ease: "easeInOut" }}
+                className="overflow-hidden"
+              >
+                <div className="pt-3 mt-1 border-t border-[--color-border] bg-[--color-bone] -mx-4 px-4 pb-3">
+                  {isStreaming && !aiData && <AISkeleton />}
+
+                  {aiData && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.25 }}
+                      className="flex flex-col gap-3 pt-1"
+                    >
+                      {/* Pairs with */}
+                      <p
+                        style={{ fontFamily: "var(--font-serif)" }}
+                        className="text-sm italic text-[--color-ink] leading-relaxed"
+                      >
+                        Pairs well with {aiData.pairsWith}
+                        {isStreaming && (
+                          <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 animate-pulse" />
+                        )}
+                      </p>
+
+                      {/* Best for */}
                       <p
                         style={{ fontFamily: "var(--font-sans)" }}
-                        className="text-[10px] uppercase tracking-[0.1em] text-[--color-taupe] mb-1.5"
+                        className="text-[11px] text-[--color-taupe] leading-relaxed"
                       >
-                        Flavor Profile
+                        {aiData.bestFor}
+                        {isStreaming && (
+                          <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 animate-pulse" />
+                        )}
                       </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {aiData.flavorTags.map((tag, i) => (
-                          <motion.span
-                            key={i}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: i * 0.06 }}
-                            style={{ fontFamily: "var(--font-sans)" }}
-                            className="text-[11px] px-2.5 py-0.5 border border-[--color-border] rounded-full text-[--color-ink] uppercase tracking-[0.08em]"
+
+                      {streamError && (
+                        <p className="text-[10px] text-[--color-taupe] italic">
+                          — {streamError}{" "}
+                          <button
+                            onClick={e => { e.stopPropagation(); cache.current = null; fetchAI(); }}
+                            className="underline hover:no-underline"
                           >
-                            {tag.emoji} {tag.label}
-                          </motion.span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Pairs with */}
-                    <p
-                      style={{ fontFamily: "var(--font-serif)" }}
-                      className="text-sm italic text-[--color-ink] leading-relaxed"
-                    >
-                      Pairs well with {aiData.pairsWith}
-                      {isStreaming && (
-                        <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 animate-pulse" />
+                            Try again?
+                          </button>
+                        </p>
                       )}
-                    </p>
 
-                    {/* Best for */}
-                    <p
-                      style={{ fontFamily: "var(--font-sans)" }}
-                      className="text-[11px] text-[--color-taupe] leading-relaxed"
-                    >
-                      {aiData.bestFor}
-                      {isStreaming && (
-                        <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 animate-pulse" />
-                      )}
-                    </p>
+                      <p
+                        style={{ fontFamily: "var(--font-sans)" }}
+                        className="text-[10px] italic text-[--color-taupe]"
+                      >
+                        AI-generated
+                      </p>
+                    </motion.div>
+                  )}
 
-                    {streamError && (
-                      <p className="text-[10px] text-[--color-taupe] italic">
-                        — {streamError}{" "}
+                  {!aiData && streamError && (
+                    <div className="py-2">
+                      <p style={{ fontFamily: "var(--font-sans)" }} className="text-xs text-[--color-taupe]">
+                        Couldn't load flavor notes.{" "}
                         <button
                           onClick={e => { e.stopPropagation(); cache.current = null; fetchAI(); }}
                           className="underline hover:no-underline"
@@ -349,59 +372,37 @@ export default function ProductCard({
                           Try again?
                         </button>
                       </p>
-                    )}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-                    <p
-                      style={{ fontFamily: "var(--font-sans)" }}
-                      className="text-[10px] italic text-[--color-taupe]"
-                    >
-                      AI-generated
-                    </p>
-                  </motion.div>
-                )}
+          {/* ── Footer actions ────────────────────────────────────────── */}
+          <div className="mt-auto pt-3 flex flex-col gap-1.5">
+            <Button
+              variant="primary"
+              size="sm"
+              className="w-full"
+              onClick={handleAddToCart}
+            >
+              Add to Cart
+            </Button>
 
-                {!aiData && streamError && (
-                  <div className="py-2">
-                    <p style={{ fontFamily: "var(--font-sans)" }} className="text-xs text-[--color-taupe]">
-                      Couldn't load flavor notes.{" "}
-                      <button
-                        onClick={e => { e.stopPropagation(); cache.current = null; fetchAI(); }}
-                        className="underline hover:no-underline"
-                      >
-                        Try again?
-                      </button>
-                    </p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Footer actions ────────────────────────────────────────── */}
-        <div className="mt-auto pt-2 flex flex-col gap-1.5">
-          <button
-            onClick={handleAddToCart}
-            style={{ fontFamily: "var(--font-sans)" }}
-            className={`w-full border border-[--color-ink] bg-[--color-ink] text-[--color-cream] uppercase tracking-[0.12em] font-medium transition-[background-color,color] duration-200 hover:bg-[--color-cream] hover:text-[--color-ink] flex items-center justify-center gap-2 active:scale-[0.97] cursor-pointer rounded-[--radius-sm] ${
-              compact ? "py-2 text-[10px]" : "py-2.5 text-xs"
-            }`}
-          >
-            <ShoppingBag size={compact ? 12 : 14} /> Add to Cart
-          </button>
-
-          <button
-            onClick={toggleExpand}
-            style={{ fontFamily: "var(--font-sans)" }}
-            className={`w-full flex items-center justify-center gap-1.5 text-[--color-taupe] hover:text-[--color-ink] transition-colors duration-200 active:scale-[0.97] rounded-[--radius-sm] ${
-              compact ? "py-1 text-[10px]" : "py-1 text-xs"
-            }`}
-          >
-            <Sparkles size={compact ? 10 : 11} />
-            {isExpanded ? "Collapse" : "✦ Explore flavors"}
-          </button>
+            {!compact && (
+              <button
+                onClick={toggleExpand}
+                style={{ fontFamily: "var(--font-sans)" }}
+                className="w-full flex items-center justify-center gap-1.5 text-[--color-taupe] hover:text-[--color-ink] transition-colors duration-200 active:scale-[0.97] rounded-[--radius-sm] py-1 text-xs"
+              >
+                <Sparkles size={11} />
+                {isExpanded ? "Collapse" : "✦ Explore flavors"}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      </Card>
     </motion.div>
   );
 }
