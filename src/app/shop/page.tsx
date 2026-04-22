@@ -59,7 +59,7 @@ export default function ShopPage() {
               }}
               className="uppercase font-medium"
             >
-              Our Collection
+              [Our Collection]
             </p>
             <h1
               style={{
