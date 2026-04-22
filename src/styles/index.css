@@ -6,3 +6,10 @@
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
+
+.product-card {
+  transition: box-shadow 250ms var(--ease-out);
+}
+.product-card:hover {
+  box-shadow: var(--shadow-lg) !important;
+}

@@ -146,7 +146,6 @@ export default function ProductCard({
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [aiData, setAiData] = useState<AIProductData | null>(null);
-  const [isHovered, setIsHovered] = useState(false);
 
   const cache = useRef<AIProductData | null>(null);
   const buffer = useRef("");
@@ -188,8 +187,9 @@ export default function ProductCard({
             }
           }
         },
-        onError: () => {
+        onError: (err) => {
           setIsStreaming(false);
+          setStreamError(err.message);   // ADD THIS LINE
           const mock = getMockFlavor(name, description);
           cache.current = mock;
           setAiData(mock);
@@ -217,9 +217,6 @@ export default function ProductCard({
 
   const handleAddToCart = () => addToCart({ id, name, price, image, calories });
 
-  // Determine shadow based on hover state
-  const shadowStyle = isHovered ? "var(--shadow-lg)" : "var(--shadow)";
-
   return (
     <motion.div
       layout
@@ -227,13 +224,10 @@ export default function ProductCard({
     >
       <Card
         variant="default"
-        className="flex flex-col"
+        className="product-card flex flex-col"
         style={{
-          boxShadow: shadowStyle,
-          transition: "box-shadow 250ms var(--ease-out)",
+          boxShadow: "var(--shadow)",
         }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         {/* Image */}
         <div className={`overflow-hidden w-full ${compact ? "aspect-[3/2]" : "aspect-[4/3]"}`}>
@@ -241,6 +235,7 @@ export default function ProductCard({
             src={image}
             alt={name}
             className="object-cover w-full h-full"
+            loading="lazy"
           />
         </div>
 
@@ -271,11 +266,17 @@ export default function ProductCard({
             </span>
           </div>
 
+          {calories && (
+            <p style={{ fontSize: "12px", color: "var(--color-taupe)", fontFamily: "var(--font-sans)", marginTop: "4px" }}>
+              {calories} cal
+            </p>
+          )}
+
           {/* Flavor tags — shown when AI data available */}
           {aiData && (
             <div className="flex flex-wrap gap-1.5 mt-2">
-              {aiData.flavorTags.slice(0, 3).map((tag, i) => (
-                <Badge key={i} variant="accent">
+              {aiData.flavorTags.slice(0, 3).map((tag) => (
+                <Badge key={tag.label} variant="accent">
                   {tag.emoji} {tag.label}
                 </Badge>
               ))}
