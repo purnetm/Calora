@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Button from "@/components/ui/Button";
 import Slider from "react-slick";
 import { X } from "lucide-react";
 import { toast } from "sonner";
@@ -57,31 +58,33 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 backdrop-blur-sm" />
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60"
           />
 
           <motion.div
             initial={{ opacity: 0, y: 12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.97 }}
-            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-            className="relative bg-[--color-ivory] border border-[--color-border] rounded-[--radius-lg] [box-shadow:var(--shadow-lg)] w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row overflow-hidden"
+            transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+            className="relative border border-[--color-border] [box-shadow:var(--shadow-lg)] w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row overflow-hidden"
+            style={{ background: "var(--color-ivory)", borderRadius: "var(--radius-lg)" }}
           >
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 p-2 text-[--color-taupe] hover:text-[--color-ink] transition-colors duration-300"
+              className="absolute top-4 right-4 z-10 p-2 text-[--color-taupe] hover:text-[--color-ink] transition-all duration-300 active:scale-[0.97]"
             >
               <X size={18} />
             </button>
 
             {/* Left Side: Form */}
-            <div className="flex-1 p-8 md:p-10 flex flex-col gap-6">
+            <div className="flex-1 p-8 md:p-10 flex flex-col gap-6" style={{ background: "var(--color-ivory)" }}>
               <div>
                 <p
                   style={{ fontFamily: "var(--font-sans)" }}
@@ -142,13 +145,14 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
                   />
                 </div>
 
-                <button
+                <Button
                   type="submit"
-                  style={{ fontFamily: "var(--font-sans)" }}
-                  className="w-full bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.14em] font-medium py-3 mt-2 border border-[--color-ink] hover:bg-[--color-cream] hover:text-[--color-ink] transition-[background-color,color,border-color] duration-200 cursor-pointer active:scale-[0.97] rounded-[--radius-sm]"
+                  variant="primary"
+                  size="md"
+                  className="w-full mt-2"
                 >
                   Confirm Subscription
-                </button>
+                </Button>
               </form>
             </div>
 
@@ -173,7 +177,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
                 <Slider {...settings}>
                   {RECOMMENDED_ITEMS.map((item) => (
                     <div key={item.id} className="px-2 outline-none">
-                      <div className="bg-[--color-cream] border border-[--color-border] rounded-[--radius-sm] overflow-hidden group">
+                      <div className="border border-[--color-border] overflow-hidden group" style={{ background: "var(--color-cream)", borderRadius: "var(--radius-sm)" }}>
                         <div className="aspect-square relative overflow-hidden">
                           <img
                             src={item.image}
@@ -201,7 +205,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
                 </Slider>
               </div>
 
-              <div className="mt-auto border border-[--color-border] bg-[--color-cream] p-4">
+              <div className="mt-auto border border-[--color-border] p-4" style={{ background: "var(--color-cream)", borderRadius: "var(--radius-base)" }}>
                 <p
                   style={{ fontFamily: "var(--font-sans)" }}
                   className="text-xs font-light text-[--color-taupe] leading-relaxed"

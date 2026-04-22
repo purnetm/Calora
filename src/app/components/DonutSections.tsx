@@ -184,7 +184,7 @@ function TestimonialCard({ quote, author, role }: Testimonial) {
         boxShadow: "var(--shadow-sm)",
         padding: 24,
       }}
-      className="flex flex-col h-full"
+      className="flex flex-col h-full transition-transform duration-200 hover:-translate-y-1"
     >
       {/* Stars */}
       <p
@@ -312,7 +312,7 @@ function PricingCard({ plan, onSelect }: PricingCardProps) {
     : "var(--color-pistachio-deep)";
 
   return (
-    <div style={cardStyle} className="flex flex-col gap-6 h-full">
+    <div style={cardStyle} className="flex flex-col gap-6 h-full transition-transform duration-200 hover:-translate-y-1">
       {/* Plan badge */}
       <span
         style={{
@@ -378,8 +378,8 @@ function PricingCard({ plan, onSelect }: PricingCardProps) {
       <Button
         onClick={onSelect}
         variant={recommended ? "outline" : "primary"}
-        size="md"
-        className="w-full"
+        size="lg"
+        className="self-center"
         style={
           recommended
             ? {
@@ -653,7 +653,7 @@ export default function DonutSections({
             key={featuredPage}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {visibleProducts.map((p) => (
@@ -685,9 +685,11 @@ export default function DonutSections({
                 Fresh Flavours, Whenever You Need Them
               </h3>
               <div>
-                <Button variant="outline" size="md" arrow>
-                  View Full Menu
-                </Button>
+                <Link to="/shop">
+                  <Button variant="outline" size="md" arrow>
+                    View Full Menu
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -757,17 +759,13 @@ export default function DonutSections({
           />
 
           {/* Photo row */}
-          <div className="flex items-end justify-center overflow-hidden">
+          <div className="flex items-end justify-center">
             {GALLERY_PHOTOS.map((src, i) => {
               const isEdge = i === 0 || i === 4;
               const isMid = i === 1 || i === 3;
               const isCenter = i === 2;
 
-              const rotation = isEdge
-                ? "-6deg"
-                : isMid
-                ? "-3deg"
-                : "0deg";
+              const rotateVal = isEdge ? -6 : isMid ? -3 : 0;
               const scale = isEdge ? 0.9 : isMid ? 0.95 : 1;
               const opacity = isEdge ? 0.8 : isMid ? 0.9 : 1;
               const overlap = !isCenter;
@@ -775,20 +773,19 @@ export default function DonutSections({
               return (
                 <motion.div
                   key={src}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity, y: 0 }}
+                  initial={{ opacity: 0, y: 20, rotate: rotateVal, scale }}
+                  whileInView={{ opacity, y: 0, rotate: rotateVal, scale }}
+                  whileHover={{ scale: 1.05, rotate: 0, opacity: 1 }}
                   viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.5, delay: i * 0.08 }}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
                   style={{
-                    transform: `rotate(${rotation}) scale(${scale})`,
                     borderRadius: "var(--radius-lg)",
                     boxShadow: "var(--shadow-lg)",
                     overflow: "hidden",
-                    zIndex: isCenter ? 2 : isMid ? 1 : 0,
                   }}
-                  className={`aspect-square w-48 shrink-0 ${
-                    overlap ? "mx-[-12px]" : ""
-                  }`}
+                  className={`aspect-square w-48 shrink-0 relative hover:z-10 ${
+                    isCenter ? "z-[2]" : isMid ? "z-[1]" : "z-0"
+                  } ${overlap ? "mx-[-12px]" : ""}`}
                 >
                   <img
                     src={src}
@@ -841,7 +838,7 @@ export default function DonutSections({
             key={testimonialPage}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6"
           >
             {visibleTestimonials.map((t) => (
@@ -926,14 +923,16 @@ export default function DonutSections({
               >
                 Start Subscription
               </Button>
-              <Button
-                variant="ghost"
-                size="md"
-                arrow
-                style={{ color: "var(--color-cream)" }}
-              >
-                Explore Menu
-              </Button>
+              <Link to="/shop">
+                <Button
+                  variant="ghost"
+                  size="md"
+                  arrow
+                  style={{ color: "var(--color-cream)" }}
+                >
+                  Explore Menu
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

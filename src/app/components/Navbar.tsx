@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ShoppingBag, Menu } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "motion/react";
 import { useCart } from "../context/CartContext";
 
 type NavLink =
@@ -59,7 +60,7 @@ export default function Navbar() {
         .nav-link-active { color: var(--color-ink); font-weight: 500; }
       `}</style>
       <nav
-        className="sticky top-0 z-50 w-full h-16 transition-all duration-300"
+        className="sticky top-0 z-50 w-full h-16 transition-[background-color,box-shadow] duration-300"
         style={{
           backgroundColor: isSolid ? "rgba(251, 247, 240, 0.95)" : "transparent",
           backdropFilter: isSolid ? "blur(12px)" : undefined,
@@ -104,19 +105,26 @@ export default function Navbar() {
           <div className="flex items-center gap-4 justify-self-end">
             <Link to="/checkout" className="relative p-2" aria-label="Shopping cart">
               <ShoppingBag size={20} style={{ color: "var(--color-ink)" }} />
-              {cartCount > 0 && (
-                <span
-                  className="absolute -top-0.5 -right-0.5 flex items-center justify-center rounded-full text-[10px] font-medium"
-                  style={{
-                    width: 16,
-                    height: 16,
-                    backgroundColor: "var(--color-gold)",
-                    color: "var(--color-cream)",
-                  }}
-                >
-                  {cartCount > 9 ? "9+" : cartCount}
-                </span>
-              )}
+              <AnimatePresence>
+                {cartCount > 0 && (
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                    className="absolute -top-0.5 -right-0.5 flex items-center justify-center rounded-full text-[10px] font-medium"
+                    style={{
+                      width: 16,
+                      height: 16,
+                      backgroundColor: "var(--color-gold)",
+                      color: "var(--color-cream)",
+                    }}
+                  >
+                    {cartCount > 9 ? "9+" : cartCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </Link>
             <button className="md:hidden p-2" aria-label="Open menu">
               <Menu size={20} style={{ color: "var(--color-ink)" }} />

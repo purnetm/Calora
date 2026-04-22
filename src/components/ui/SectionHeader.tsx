@@ -69,7 +69,7 @@ export default function SectionHeader({
               onClick={onPrev}
               aria-label="Previous"
               disabled={!onPrev}
-              className="transition-all duration-200 hover:bg-[--color-ink] hover:text-[--color-cream] cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
+              className="transition-all duration-200 hover:bg-[--color-ink] hover:text-[--color-cream] cursor-pointer disabled:opacity-40 disabled:pointer-events-none active:scale-[0.97]"
               style={navBtnStyle}
             >
               ←
@@ -78,7 +78,7 @@ export default function SectionHeader({
               onClick={onNext}
               aria-label="Next"
               disabled={!onNext}
-              className="transition-all duration-200 hover:bg-[--color-ink] hover:text-[--color-cream] cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
+              className="transition-all duration-200 hover:bg-[--color-ink] hover:text-[--color-cream] cursor-pointer disabled:opacity-40 disabled:pointer-events-none active:scale-[0.97]"
               style={navBtnStyle}
             >
               →

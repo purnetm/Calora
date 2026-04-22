@@ -132,20 +132,25 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
   return (
     <Dialog.Root open={isOpen} onOpenChange={open => !open && handleDismiss()}>
       <Dialog.Portal>
+        {/* Blur layer (non-animated — large surface) */}
+        <div className="fixed inset-0 z-50 backdrop-blur-sm pointer-events-none" />
         {/* Backdrop */}
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
 
         {/* Panel */}
         <Dialog.Content
           aria-describedby={undefined}
-          className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-[--color-ivory] border border-[--color-border] rounded-[--radius-lg] overflow-hidden focus:outline-none [box-shadow:var(--shadow-lg)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:zoom-in-[0.96] data-[state=closed]:zoom-out-[0.96] data-[state=open]:slide-in-from-top-[4px] data-[state=closed]:slide-out-to-top-[4px] duration-300"
+          className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg border border-[--color-border] overflow-hidden focus:outline-none [box-shadow:var(--shadow-lg)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:zoom-in-[0.96] data-[state=closed]:zoom-out-[0.96] data-[state=open]:slide-in-from-top-[4px] data-[state=closed]:slide-out-to-top-[4px] duration-300"
+          style={{ background: "var(--color-ivory)", borderRadius: "var(--radius-lg)" }}
         >
           {/* Progress bar */}
           {!completed && (
-            <div className="h-0.5 bg-[--color-bone] w-full">
+            <div className="h-0.5 bg-[--color-bone] w-full overflow-hidden">
               <motion.div
-                className="h-full bg-[--color-ink]"
-                animate={{ width: `${((step + 1) / 3) * 100}%` }}
+                className="h-full bg-[--color-ink] w-full"
+                style={{ transformOrigin: "left" }}
+                initial={{ scaleX: 1 / 3 }}
+                animate={{ scaleX: (step + 1) / 3 }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
               />
             </div>
@@ -231,7 +236,7 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                           key={f}
                           onClick={() => toggle(flavors, f, setFlavors)}
                           style={{ fontFamily: "var(--font-sans)" }}
-                          className={`px-4 py-2 border text-xs font-medium transition-[background-color,border-color,color] duration-150 flex items-center gap-1.5 uppercase tracking-[0.08em] cursor-pointer active:scale-[0.97] rounded-[--radius-sm] ${
+                          className={`px-4 py-2 border text-xs font-medium transition-[background-color,border-color,color] duration-150 flex items-center gap-1.5 uppercase tracking-[0.08em] cursor-pointer active:scale-[0.97] rounded-[6px] ${
                             flavors.includes(f)
                               ? "bg-[--color-ink] text-[--color-cream] border-[--color-ink]"
                               : "bg-transparent text-[--color-ink] border-[--color-border] hover:border-[--color-ink]"
@@ -252,7 +257,7 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                           key={d}
                           onClick={() => toggle(dietary, d, setDietary)}
                           style={{ fontFamily: "var(--font-sans)" }}
-                          className={`px-4 py-2 border text-xs font-medium transition-[background-color,border-color,color] duration-150 flex items-center gap-1.5 uppercase tracking-[0.08em] cursor-pointer active:scale-[0.97] rounded-[--radius-sm] ${
+                          className={`px-4 py-2 border text-xs font-medium transition-[background-color,border-color,color] duration-150 flex items-center gap-1.5 uppercase tracking-[0.08em] cursor-pointer active:scale-[0.97] rounded-[6px] ${
                             dietary.includes(d)
                               ? "bg-[--color-ink] text-[--color-cream] border-[--color-ink]"
                               : "bg-transparent text-[--color-ink] border-[--color-border] hover:border-[--color-ink]"
@@ -273,7 +278,7 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                           key={o.label}
                           onClick={() => setOccasion(o.label)}
                           style={{ fontFamily: "var(--font-sans)" }}
-                          className={`flex items-center gap-4 px-5 py-4 border text-left transition-[background-color,border-color] duration-150 cursor-pointer active:scale-[0.97] rounded-[--radius-sm] ${
+                          className={`flex items-center gap-4 px-5 py-4 border text-left transition-[background-color,border-color] duration-150 cursor-pointer active:scale-[0.97] rounded-[6px] ${
                             occasion === o.label
                               ? "bg-[--color-bone] border-[--color-ink] text-[--color-ink]"
                               : "bg-transparent border-[--color-border] text-[--color-ink] hover:border-[--color-ink]"
@@ -308,7 +313,7 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                         onClick={goNext}
                         disabled={!canNext[step]}
                         style={{ fontFamily: "var(--font-sans)" }}
-                        className="flex items-center gap-1.5 px-6 py-2.5 bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.1em] font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[--color-espresso] transition-[background-color] duration-200 cursor-pointer active:scale-[0.97] rounded-[--radius-sm]"
+                        className="flex items-center gap-1.5 px-6 py-2.5 bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.1em] font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[--color-espresso] transition-[background-color] duration-200 cursor-pointer active:scale-[0.97] rounded-[6px]"
                       >
                         Continue <ChevronRight size={14} />
                       </button>
@@ -317,7 +322,7 @@ export default function TasteProfileModal({ isOpen, onClose }: Props) {
                         onClick={handleComplete}
                         disabled={!canNext[2]}
                         style={{ fontFamily: "var(--font-sans)" }}
-                        className="flex items-center gap-1.5 px-6 py-2.5 bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.1em] font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[--color-espresso] transition-[background-color] duration-200 cursor-pointer active:scale-[0.97] rounded-[--radius-sm]"
+                        className="flex items-center gap-1.5 px-6 py-2.5 bg-[--color-ink] text-[--color-cream] text-xs uppercase tracking-[0.1em] font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[--color-espresso] transition-[background-color] duration-200 cursor-pointer active:scale-[0.97] rounded-[6px]"
                       >
                         Save preferences ✦
                       </button>

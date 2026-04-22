@@ -234,7 +234,7 @@ export default function ProductCard({
           <img
             src={image}
             alt={name}
-            className="object-cover w-full h-full"
+            className="object-cover w-full h-full transition-transform duration-500 hover:scale-[1.04]"
             loading="lazy"
           />
         </div>
@@ -306,7 +306,7 @@ export default function ProductCard({
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.28, ease: "easeInOut" }}
+                transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
                 className="overflow-hidden"
               >
                 <div className="pt-3 mt-1 border-t border-[--color-border] bg-[--color-bone] -mx-4 px-4 pb-3">
@@ -326,7 +326,7 @@ export default function ProductCard({
                       >
                         Pairs well with {aiData.pairsWith}
                         {isStreaming && (
-                          <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 animate-pulse" />
+                          <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 cursor-blink" />
                         )}
                       </p>
 
@@ -337,7 +337,7 @@ export default function ProductCard({
                       >
                         {aiData.bestFor}
                         {isStreaming && (
-                          <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 animate-pulse" />
+                          <span className="inline-block w-1 h-3 bg-[--color-taupe] ml-0.5 cursor-blink" />
                         )}
                       </p>
 
@@ -384,8 +384,8 @@ export default function ProductCard({
           <div className="mt-auto pt-3 flex flex-col gap-1.5">
             <Button
               variant="primary"
-              size="sm"
-              className="w-full"
+              size={compact ? "sm" : "md"}
+              className="self-center"
               onClick={handleAddToCart}
             >
               Add to Cart

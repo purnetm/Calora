@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Button from "@/components/ui/Button";
 import { ALL_PRODUCTS } from "@/app/data/products";
 
@@ -66,53 +67,34 @@ export default function DonutLanding({
           </div>
 
           {/* Flavor chips */}
-          <div className="flex gap-3 mt-6 flex-wrap">
+          <div className="flex gap-3 mt-8 flex-wrap">
             {CHIP_PRODUCTS.map((chip) => (
               <div
                 key={chip.name}
-                className="flex items-center gap-2 px-3 py-2"
+                className="flex items-center gap-3 px-4 py-3 hover:-translate-y-0.5 transition-transform duration-200 cursor-pointer"
                 style={{
                   background: chip.bg,
-                  borderRadius: "var(--radius-base, 14px)",
+                  borderRadius: "var(--radius-lg)",
                 }}
               >
-                {/* Small circular image */}
                 {chip.image ? (
                   <img
                     src={chip.image}
                     alt={chip.name}
                     className="rounded-full object-cover flex-shrink-0"
-                    style={{ width: 40, height: 40 }}
+                    style={{ width: 52, height: 52 }}
                   />
                 ) : (
                   <div
                     className="rounded-full flex-shrink-0"
-                    style={{
-                      width: 40,
-                      height: 40,
-                      background: "var(--color-taupe)",
-                      opacity: 0.4,
-                    }}
+                    style={{ width: 52, height: 52, background: "var(--color-taupe)", opacity: 0.4 }}
                   />
                 )}
-                {/* Name + price */}
-                <div className="flex flex-col">
-                  <span
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "13px",
-                      color: "var(--color-ink)",
-                    }}
-                  >
+                <div className="flex flex-col gap-0.5">
+                  <span style={{ fontFamily: "var(--font-sans)", fontSize: "14px", color: "var(--color-ink)", fontWeight: 500 }}>
                     {chip.name}
                   </span>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "12px",
-                      color: "var(--color-gold)",
-                    }}
-                  >
+                  <span style={{ fontFamily: "var(--font-sans)", fontSize: "13px", color: "var(--color-gold)" }}>
                     {chip.price}
                   </span>
                 </div>
@@ -129,19 +111,16 @@ export default function DonutLanding({
             >
               Book Your Event
             </Button>
-            <Button
-              variant="ghost"
-              size="lg"
-              arrow
-              onClick={onOpenModal}
-            >
-              Explore Our Menu
-            </Button>
+            <Link to="/shop">
+              <Button variant="ghost" size="lg" arrow>
+                Explore Our Menu
+              </Button>
+            </Link>
           </div>
         </div>
 
         {/* Right column — hero image */}
-        <div className="overflow-hidden h-[480px] lg:h-[600px]">
+        <div className="overflow-hidden h-[480px] lg:h-[600px]" style={{ borderRadius: "var(--radius-xl)" }}>
           <img
             src={imgHero}
             alt="Gourmet dessert"
@@ -152,10 +131,11 @@ export default function DonutLanding({
 
       {/* ── Marquee strip ─────────────────────────────────────────────── */}
       <div
-        className="w-full overflow-hidden py-3"
+        className="w-full overflow-hidden py-3 group"
         style={{ background: "var(--color-pistachio)" }}
       >
         <div
+          className="group-hover:[animation-play-state:paused]"
           style={{
             display: "flex",
             whiteSpace: "nowrap",

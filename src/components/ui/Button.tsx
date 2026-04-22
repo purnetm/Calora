@@ -25,7 +25,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center rounded-full font-medium cursor-pointer transition-all duration-200 select-none disabled:opacity-50 disabled:pointer-events-none";
+    "inline-flex items-center justify-center rounded-full font-medium cursor-pointer transition-all duration-200 select-none disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97]";
 
   const variantStyles: Record<ButtonVariant, React.CSSProperties> = {
     primary: {
