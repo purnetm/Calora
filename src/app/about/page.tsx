@@ -9,7 +9,6 @@ export default function AboutPage() {
       {/* 1. Full-width Hero Image Block */}
       <section
         className="relative overflow-hidden pt-16 aspect-[4/3] md:aspect-video w-full"
-        style={{ position: "relative" }}
       >
         <img
           src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=1400&q=80"
@@ -44,10 +43,9 @@ export default function AboutPage() {
             style={{
               fontFamily: "var(--font-sans)",
               fontSize: "16px",
-              color: "rgba(var(--color-cream-rgb, 248, 243, 233), 0.80)",
+              color: "var(--color-cream)",
               opacity: 0.80,
             }}
-            className="text-[--color-cream]"
           >
             Premium handcrafted desserts, made with love
           </motion.p>
