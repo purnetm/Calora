@@ -59,15 +59,18 @@ export default function Navbar() {
         .nav-link:hover { color: var(--color-ink); }
         .nav-link-active { color: var(--color-ink); font-weight: 500; }
       `}</style>
-      <nav
-        className="sticky top-0 z-50 w-full h-16 transition-[background-color,box-shadow] duration-300"
-        style={{
-          backgroundColor: isSolid ? "rgba(251, 247, 240, 0.95)" : "transparent",
-          backdropFilter: isSolid ? "blur(12px)" : undefined,
-          boxShadow: isSolid ? "var(--shadow-sm)" : undefined,
-        }}
-      >
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 h-full grid grid-cols-3 items-center">
+      <nav className="sticky top-0 z-50 w-full h-16">
+        {/* Background layer — opacity-only transition keeps this off the paint thread */}
+        <div
+          className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
+          style={{
+            opacity: isSolid ? 1 : 0,
+            backgroundColor: "rgba(251, 247, 240, 0.95)",
+            backdropFilter: "blur(12px)",
+            boxShadow: "var(--shadow-sm)",
+          }}
+        />
+        <div className="relative z-10 max-w-[1440px] mx-auto px-4 md:px-8 h-full grid grid-cols-3 items-center">
           {/* Logo — left column */}
           <Link
             to="/"

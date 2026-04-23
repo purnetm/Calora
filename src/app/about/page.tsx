@@ -47,7 +47,7 @@ export default function AboutPage() {
               opacity: 0.80,
             }}
           >
-            Premium handcrafted desserts, made with love
+            Handcrafted patisserie — fewer calories, zero compromise.
           </motion.p>
         </div>
       </section>
@@ -89,6 +89,12 @@ export default function AboutPage() {
                   className="text-sm font-light leading-relaxed text-[--color-taupe]"
                 >
                   Today, Calora ships handcrafted desserts across the country, but the kitchen philosophy hasn&rsquo;t changed — small batches, quality ingredients, and an unwillingness to cut corners.
+                </p>
+                <p
+                  style={{ fontFamily: "var(--font-sans)" }}
+                  className="text-sm font-light leading-relaxed text-[--color-taupe]"
+                >
+                  What makes Calora different isn&rsquo;t just how we make things — it&rsquo;s what we choose not to use. Every recipe is calorie-counted, refined-sugar-reduced, and made without artificial anything. Not because we&rsquo;re a health food brand. Because we believe you shouldn&rsquo;t have to choose between eating well and eating beautifully.
                 </p>
               </div>
             </motion.div>
@@ -148,23 +154,23 @@ export default function AboutPage() {
               lineHeight: 1.2,
             }}
           >
-            Desserts For Everyone
+            Indulgence, Redefined.
           </h2>
           <p
             style={{ fontFamily: "var(--font-sans)" }}
             className="mt-4 text-sm font-light leading-relaxed text-[--color-ink] opacity-80"
           >
-            We believe indulgence should be inclusive. Every flavour in our collection is thoughtfully crafted.
+            Every item is calorie-counted and crafted without artificial preservatives, refined sugars, or shortcuts. Because you deserve dessert that loves you back.
           </p>
 
           {/* Bullet grid */}
           <div className="max-w-3xl mx-auto mt-8">
             <ul className="grid grid-cols-2 md:grid-cols-2 gap-x-12 gap-y-3 text-left list-disc list-inside">
               {[
-                "Gluten-free options available",
-                "Vegan-friendly flavours",
-                "No artificial preservatives",
-                "Nut-free variants on request",
+                "Crafted gluten-free, always",
+                "Fully plant-based options, made to the same standard",
+                "Zero artificial preservatives — ever",
+                "Nut-free variants, available for every item",
               ].map((item) => (
                 <li
                   key={item}
@@ -196,17 +202,17 @@ export default function AboutPage() {
               {
                 number: "01",
                 title: "Quality First",
-                description: "Crafted with intention, never cut corners.",
+                description: "Every ingredient earns its place — chosen for flavour, not filler.",
               },
               {
                 number: "02",
-                title: "Community",
-                description: "Grown by word of mouth and love.",
+                title: "Mindful Craft",
+                description: "We count every calorie so you don't have to feel counted out. Transparency is the foundation, not a feature.",
               },
               {
                 number: "03",
-                title: "Creativity",
-                description: "New flavours every season.",
+                title: "Always Evolving",
+                description: "New recipes every season — always pushing the boundary of what a guilt-free dessert can taste like.",
               },
             ].map((value, index) => (
               <motion.div

@@ -303,11 +303,10 @@ export default function ProductCard({
             {isExpanded && !compact && (
               <motion.div
                 key="ai-section"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-                className="overflow-hidden"
               >
                 <div className="pt-3 mt-1 border-t border-[--color-border] bg-[--color-bone] -mx-4 px-4 pb-3">
                   {isStreaming && !aiData && <AISkeleton />}

@@ -1,8 +1,45 @@
-import React, { useState, useMemo } from "react";
-import { motion } from "motion/react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
+import { motion, AnimatePresence, useSpring, useTransform, useInView } from "motion/react";
 import { Link } from "react-router-dom";
 import { Button, SectionHeader } from "@/components/ui";
 import ProductCard from "./ProductCard";
+
+// ── Animation variants (composite-only: opacity + transform) ──────────────
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] as const } },
+};
+const fadeLeft = {
+  hidden: { opacity: 0, x: -24 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] as const } },
+};
+const fadeRight = {
+  hidden: { opacity: 0, x: 24 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] as const } },
+};
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+};
+// Direction-aware slide for paged carousels
+const slideVariants = {
+  enter: (dir: number) => ({ x: dir * 64, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit:  (dir: number) => ({ x: dir * -64, opacity: 0 }),
+};
+const VP = { once: true, margin: "-80px" as const };
+
+// ── CountUp — springs from 0 to target when scrolled into view ────────────
+function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: string; decimals?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true });
+  const spring = useSpring(0, { duration: 1400, bounce: 0 });
+  const display = useTransform(spring, (v) =>
+    `${decimals > 0 ? v.toFixed(decimals) : Math.round(v).toLocaleString()}${suffix}`
+  );
+  useEffect(() => { if (isInView) spring.set(to); }, [isInView, spring, to]);
+  return <motion.span ref={ref}>{display}</motion.span>;
+}
 
 // ── Featured product pool (cycled via arrow pager) ─────────────────────────
 
@@ -87,6 +124,7 @@ interface Testimonial {
   quote: string;
   author: string;
   role: string;
+  avatar: string;
 }
 
 const TESTIMONIALS: Testimonial[] = [
@@ -95,36 +133,42 @@ const TESTIMONIALS: Testimonial[] = [
       "Calora has completely redefined what a weekly sweet treat can feel like. Every box arrives like a small celebration — beautifully composed and always memorable.",
     author: "Priya Sharma",
     role: "Creative Director",
+    avatar: "https://images.unsplash.com/photo-1625236115453-fed1ca2fa29f?auto=format&fit=crop&w=120&q=80",
   },
   {
     quote:
       "I've sent Calora gift boxes to every single one of our corporate partners this year. The response is always the same: pure delight. Nothing else comes close.",
     author: "Arjun Mehta",
     role: "Head of Partnerships",
+    avatar: "https://images.unsplash.com/photo-1592234789031-94bf65f630ed?auto=format&fit=crop&w=120&q=80",
   },
   {
     quote:
       "The pistachio macarons are genuinely the best I've had outside of Paris. Calora brings proper craft to Indian patisserie and it shows in every bite.",
     author: "Kavya Reddy",
     role: "Food Writer",
+    avatar: "https://images.unsplash.com/photo-1625236115496-8a3581ba7166?auto=format&fit=crop&w=120&q=80",
   },
   {
     quote:
       "We chose Calora for our wedding dessert table and it was the talk of the reception. Thoughtful, elegant, and absolutely delicious.",
     author: "Rohan & Ishaani",
     role: "Newlyweds",
+    avatar: "https://images.unsplash.com/photo-1588560979004-a4de3190506e?auto=format&fit=crop&w=120&q=80",
   },
   {
     quote:
       "Subscribing was the best decision. Knowing a box of something beautiful is on its way every month is a small luxury I refuse to give up.",
     author: "Meera Iyer",
     role: "Architect",
+    avatar: "https://images.unsplash.com/photo-1600016263747-2b4d4734bc92?auto=format&fit=crop&w=120&q=80",
   },
   {
     quote:
       "The presentation is museum-quality and the flavours live up to it. Calora is not a dessert brand — it's a ritual.",
     author: "Vikram Joshi",
     role: "Restaurateur",
+    avatar: "https://images.unsplash.com/photo-1619950498711-c2d22c4c3cb7?auto=format&fit=crop&w=120&q=80",
   },
 ];
 
@@ -175,7 +219,7 @@ const PRICING_PLANS: PricingPlan[] = [
 
 // ── TestimonialCard (sub-component) ────────────────────────────────────────
 
-function TestimonialCard({ quote, author, role }: Testimonial) {
+function TestimonialCard({ quote, author, role, avatar }: Testimonial) {
   return (
     <div
       style={{
@@ -238,14 +282,17 @@ function TestimonialCard({ quote, author, role }: Testimonial) {
 
       {/* Author row */}
       <div className="flex items-center gap-3 mt-auto">
-        <div
+        <img
+          src={avatar}
+          alt={author}
           style={{
-            width: 32,
-            height: 32,
+            width: 44,
+            height: 44,
             borderRadius: "var(--radius-full)",
-            background: "var(--color-bone)",
+            objectFit: "cover",
+            flexShrink: 0,
+            border: "2px solid var(--color-border)",
           }}
-          aria-hidden="true"
         />
         <div className="flex flex-col">
           <span
@@ -312,7 +359,7 @@ function PricingCard({ plan, onSelect }: PricingCardProps) {
     : "var(--color-pistachio-deep)";
 
   return (
-    <div style={cardStyle} className="flex flex-col gap-6 h-full transition-transform duration-200 hover:-translate-y-1">
+    <div style={cardStyle} className="flex flex-col gap-6 h-full">
       {/* Plan badge */}
       <span
         style={{
@@ -404,6 +451,7 @@ export default function DonutSections({
 }) {
   // Featured products pager: 3 at a time
   const [featuredPage, setFeaturedPage] = useState(0);
+  const [featuredDir, setFeaturedDir] = useState(1);
   const totalFeaturedPages = Math.max(
     1,
     Math.ceil(FEATURED_PRODUCTS.length / PRODUCTS_PER_PAGE)
@@ -417,6 +465,7 @@ export default function DonutSections({
 
   // Testimonial pager: 3 at a time
   const [testimonialPage, setTestimonialPage] = useState(0);
+  const [testimonialDir, setTestimonialDir] = useState(1);
   const totalTestimonialPages = Math.max(
     1,
     Math.ceil(TESTIMONIALS.length / TESTIMONIALS_PER_PAGE)
@@ -440,15 +489,21 @@ export default function DonutSections({
         }}
       >
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-wrap items-center justify-center">
+          <motion.div
+            className="flex flex-wrap items-center justify-center"
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={VP}
+          >
             {[
-              { numeral: "1,200+", label: "Happy Customers" },
-              { numeral: "50+", label: "Flavours" },
-              { numeral: "4.8★", label: "Avg Rating" },
-              { numeral: "3 Cities", label: "Delivery" },
+              { label: "Happy Customers", countTo: 1200, suffix: "+" },
+              { label: "Flavours", countTo: 50, suffix: "+" },
+              { label: "Avg Rating", countTo: 4.8, suffix: "★", decimals: 1 },
+              { label: "Delivery", countTo: 3, prefix: "", suffix: " Cities" },
             ].map((stat, i, arr) => (
               <React.Fragment key={stat.label}>
-                <div className="flex flex-col items-center gap-1 text-center">
+                <motion.div variants={fadeUp} className="flex flex-col items-center gap-1 text-center">
                   <span
                     style={{
                       fontFamily: "var(--font-display)",
@@ -458,7 +513,7 @@ export default function DonutSections({
                       lineHeight: 1,
                     }}
                   >
-                    {stat.numeral}
+                    <CountUp to={stat.countTo} suffix={stat.suffix ?? ""} decimals={stat.decimals ?? 0} />
                   </span>
                   <span
                     style={{
@@ -471,7 +526,7 @@ export default function DonutSections({
                   >
                     {stat.label}
                   </span>
-                </div>
+                </motion.div>
                 {i < arr.length - 1 && (
                   <span
                     className="mx-6"
@@ -488,7 +543,7 @@ export default function DonutSections({
                 )}
               </React.Fragment>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -498,22 +553,25 @@ export default function DonutSections({
         style={{ background: "var(--color-cream)" }}
       >
         <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6 }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
-          >
-            {/* Left column */}
-            <div className="flex flex-col gap-8">
-              <SectionHeader
-                eyebrow="ABOUT CALORA"
-                headline="Small-batch patisserie, thoughtfully delivered."
-                description="Calora is a patisserie house built around one quiet idea — that dessert should feel like a small, considered ritual. Every box we send is hand-finished by our kitchen, crafted from seasonal ingredients, and packed with the kind of care you'd give a gift."
-              />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Left column — stagger text blocks */}
+            <motion.div
+              className="flex flex-col gap-8"
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={VP}
+            >
+              <motion.div variants={fadeUp}>
+                <SectionHeader
+                  eyebrow="ABOUT CALORA"
+                  headline="Small-batch patisserie, thoughtfully delivered."
+                  description="Calora is a patisserie house built around one quiet idea — that dessert should feel like a small, considered ritual. Every box we send is hand-finished by our kitchen, crafted from seasonal ingredients, and packed with the kind of care you'd give a gift."
+                />
+              </motion.div>
 
-              <p
+              <motion.p
+                variants={fadeUp}
                 style={{
                   fontFamily: "var(--font-sans)",
                   color: "var(--color-taupe)",
@@ -527,11 +585,10 @@ export default function DonutSections({
                 subscription, a corporate gift, or a wedding dessert table —
                 the goal is always the same: something memorable, made by
                 hand.
-              </p>
+              </motion.p>
 
               {/* Social proof row */}
-              <div className="flex flex-wrap items-center gap-8">
-                {/* Customers */}
+              <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-8">
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-2">
                     {[0, 1, 2].map((i) => (
@@ -565,14 +622,9 @@ export default function DonutSections({
                   </span>
                 </div>
 
-                {/* Rating */}
                 <div className="flex items-center gap-2">
                   <span
-                    style={{
-                      color: "var(--color-gold)",
-                      fontSize: 16,
-                      lineHeight: 1,
-                    }}
+                    style={{ color: "var(--color-gold)", fontSize: 16, lineHeight: 1 }}
                     aria-hidden="true"
                   >
                     ★
@@ -588,11 +640,17 @@ export default function DonutSections({
                     4.8 Rating
                   </span>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            {/* Right column — image */}
-            <div className="relative">
+            {/* Right column — image slides from right */}
+            <motion.div
+              className="relative"
+              variants={fadeRight}
+              initial="hidden"
+              whileInView="visible"
+              viewport={VP}
+            >
               <div
                 style={{
                   borderRadius: "var(--radius-xl)",
@@ -607,7 +665,6 @@ export default function DonutSections({
                   alt="A selection of Calora desserts"
                   className="w-full h-full object-cover"
                 />
-                {/* Watermark */}
                 <div
                   className="absolute bottom-6 left-6 pointer-events-none select-none"
                   style={{
@@ -623,8 +680,8 @@ export default function DonutSections({
                   Calora
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -634,32 +691,41 @@ export default function DonutSections({
         style={{ background: "var(--color-cream)" }}
       >
         <div className="max-w-7xl mx-auto px-6 flex flex-col gap-12">
-          <SectionHeader
-            eyebrow="WHAT WE OFFER"
-            headline="Flavours of the season."
-            description="A curated rotation of six desserts this month, hand-finished and delivered fresh to your door."
-            arrows
-            onPrev={() =>
-              setFeaturedPage(
-                (p) => (p - 1 + totalFeaturedPages) % totalFeaturedPages
-              )
-            }
-            onNext={() =>
-              setFeaturedPage((p) => (p + 1) % totalFeaturedPages)
-            }
-          />
-
-          <motion.div
-            key={featuredPage}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {visibleProducts.map((p) => (
-              <ProductCard key={p.id} {...p} />
-            ))}
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={VP}>
+            <SectionHeader
+              eyebrow="WHAT WE OFFER"
+              headline="Flavours of the season."
+              description="A curated rotation of six desserts this month, hand-finished and delivered fresh to your door."
+              arrows
+              onPrev={() => {
+                setFeaturedDir(-1);
+                setFeaturedPage((p) => (p - 1 + totalFeaturedPages) % totalFeaturedPages);
+              }}
+              onNext={() => {
+                setFeaturedDir(1);
+                setFeaturedPage((p) => (p + 1) % totalFeaturedPages);
+              }}
+            />
           </motion.div>
+
+          <div className="overflow-hidden">
+            <AnimatePresence mode="wait" custom={featuredDir}>
+              <motion.div
+                key={featuredPage}
+                custom={featuredDir}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {visibleProducts.map((p) => (
+                  <ProductCard key={p.id} {...p} />
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </section>
 
@@ -670,8 +736,14 @@ export default function DonutSections({
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
-            {/* Left (40%) */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
+            {/* Left (40%) — slides from left */}
+            <motion.div
+              className="lg:col-span-2 flex flex-col gap-6"
+              variants={fadeLeft}
+              initial="hidden"
+              whileInView="visible"
+              viewport={VP}
+            >
               <h3
                 style={{
                   fontFamily: "var(--font-display)",
@@ -691,57 +763,32 @@ export default function DonutSections({
                   </Button>
                 </Link>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Right (60%) */}
-            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {/* Right (60%) — items stagger from right */}
+            <motion.div
+              className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8"
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={VP}
+            >
               {[
-                {
-                  icon: "🚚",
-                  title: "Pickup & Delivery",
-                  body: "Same-day delivery available",
-                },
-                {
-                  icon: "🎁",
-                  title: "Gift Boxes",
-                  body: "Custom corporate gifting",
-                },
-                {
-                  icon: "🎉",
-                  title: "Event Catering",
-                  body: "Weddings & private events",
-                },
+                { icon: "🚚", title: "Pickup & Delivery", body: "Same-day delivery available" },
+                { icon: "🎁", title: "Gift Boxes", body: "Custom corporate gifting" },
+                { icon: "🎉", title: "Event Catering", body: "Weddings & private events" },
               ].map((item) => (
-                <div key={item.title} className="flex flex-col gap-2">
-                  <span
-                    style={{ fontSize: 24, lineHeight: 1 }}
-                    aria-hidden="true"
-                  >
-                    {item.icon}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "var(--color-ink)",
-                    }}
-                  >
+                <motion.div key={item.title} variants={fadeRight} className="flex flex-col gap-2">
+                  <span style={{ fontSize: 24, lineHeight: 1 }} aria-hidden="true">{item.icon}</span>
+                  <span style={{ fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600, color: "var(--color-ink)" }}>
                     {item.title}
                   </span>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: 12,
-                      color: "var(--color-taupe)",
-                      lineHeight: 1.5,
-                    }}
-                  >
+                  <span style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--color-taupe)", lineHeight: 1.5 }}>
                     {item.body}
                   </span>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -752,11 +799,13 @@ export default function DonutSections({
         style={{ background: "var(--color-bone)" }}
       >
         <div className="max-w-7xl mx-auto px-6 flex flex-col gap-12">
-          <SectionHeader
-            eyebrow="PAST EVENTS"
-            headline="A Taste of What We Do"
-            description="From intimate dinners to full-scale weddings — a glimpse of recent Calora moments."
-          />
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={VP}>
+            <SectionHeader
+              eyebrow="PAST EVENTS"
+              headline="A Taste of What We Do"
+              description="From intimate dinners to full-scale weddings — a glimpse of recent Calora moments."
+            />
+          </motion.div>
 
           {/* Photo row */}
           <div className="flex items-end justify-center">
@@ -819,32 +868,41 @@ export default function DonutSections({
         style={{ background: "var(--color-cream)" }}
       >
         <div className="max-w-7xl mx-auto px-6 flex flex-col gap-12">
-          <SectionHeader
-            eyebrow="TESTIMONIALS"
-            headline="What Our Clients Say"
-            description="A few words from the people who keep the oven warm."
-            arrows
-            onPrev={() =>
-              setTestimonialPage(
-                (p) => (p - 1 + totalTestimonialPages) % totalTestimonialPages
-              )
-            }
-            onNext={() =>
-              setTestimonialPage((p) => (p + 1) % totalTestimonialPages)
-            }
-          />
-
-          <motion.div
-            key={testimonialPage}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
-          >
-            {visibleTestimonials.map((t) => (
-              <TestimonialCard key={t.author} {...t} />
-            ))}
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={VP}>
+            <SectionHeader
+              eyebrow="TESTIMONIALS"
+              headline="What Our Clients Say"
+              description="A few words from the people who keep the oven warm."
+              arrows
+              onPrev={() => {
+                setTestimonialDir(-1);
+                setTestimonialPage((p) => (p - 1 + totalTestimonialPages) % totalTestimonialPages);
+              }}
+              onNext={() => {
+                setTestimonialDir(1);
+                setTestimonialPage((p) => (p + 1) % totalTestimonialPages);
+              }}
+            />
           </motion.div>
+
+          <div className="overflow-hidden">
+            <AnimatePresence mode="wait" custom={testimonialDir}>
+              <motion.div
+                key={testimonialPage}
+                custom={testimonialDir}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+              >
+                {visibleTestimonials.map((t) => (
+                  <TestimonialCard key={t.author} {...t} />
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </section>
 
@@ -855,21 +913,32 @@ export default function DonutSections({
         style={{ background: "var(--color-ivory)" }}
       >
         <div className="max-w-7xl mx-auto px-6 flex flex-col gap-12">
-          <SectionHeader
-            eyebrow="SUBSCRIBE & SAVE"
-            headline="Choose Your Sweet Plan"
-            description="Three ways to make Calora part of your month. Pause or cancel any time."
-          />
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={VP}>
+            <SectionHeader
+              eyebrow="SUBSCRIBE & SAVE"
+              headline="Choose Your Sweet Plan"
+              description="Three ways to make Calora part of your month. Pause or cancel any time."
+            />
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={VP}
+          >
             {PRICING_PLANS.map((plan) => (
-              <PricingCard
+              <motion.div
                 key={plan.name}
-                plan={plan}
-                onSelect={onOpenModal}
-              />
+                variants={fadeUp}
+                whileHover={{ y: -4 }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
+              >
+                <PricingCard plan={plan} onSelect={onOpenModal} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -880,8 +949,14 @@ export default function DonutSections({
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left */}
-            <div className="flex flex-col gap-4">
+            {/* Left — slides from left */}
+            <motion.div
+              className="flex flex-col gap-4"
+              variants={fadeLeft}
+              initial="hidden"
+              whileInView="visible"
+              viewport={VP}
+            >
               <h2
                 style={{
                   fontFamily: "var(--font-display)",
@@ -899,7 +974,7 @@ export default function DonutSections({
                 style={{
                   fontFamily: "var(--font-sans)",
                   fontSize: 15,
-                  color: "rgba(251, 247, 240, 0.75)", /* --color-cream with opacity */
+                  color: "rgba(251, 247, 240, 0.75)",
                   fontWeight: 300,
                   lineHeight: 1.6,
                   maxWidth: "34rem",
@@ -908,32 +983,30 @@ export default function DonutSections({
                 Start a subscription today, or send a Calora box to someone
                 who deserves a little sweetness this week.
               </p>
-            </div>
+            </motion.div>
 
-            {/* Right */}
-            <div className="flex flex-wrap items-center gap-4 lg:justify-end">
+            {/* Right — buttons slide from right */}
+            <motion.div
+              className="flex flex-wrap items-center gap-4 lg:justify-end"
+              variants={fadeRight}
+              initial="hidden"
+              whileInView="visible"
+              viewport={VP}
+            >
               <Button
                 variant="outline"
                 size="md"
                 onClick={onOpenModal}
-                style={{
-                  color: "var(--color-cream)",
-                  borderColor: "var(--color-cream)",
-                }}
+                style={{ color: "var(--color-cream)", borderColor: "var(--color-cream)" }}
               >
                 Start Subscription
               </Button>
               <Link to="/shop">
-                <Button
-                  variant="ghost"
-                  size="md"
-                  arrow
-                  style={{ color: "var(--color-cream)" }}
-                >
+                <Button variant="ghost" size="md" arrow style={{ color: "var(--color-cream)" }}>
                   Explore Menu
                 </Button>
               </Link>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -947,9 +1020,15 @@ export default function DonutSections({
         }}
       >
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-4 gap-8"
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={VP}
+          >
             {/* Col 1 — Logo + tagline */}
-            <div className="flex flex-col gap-3">
+            <motion.div variants={fadeUp} className="flex flex-col gap-3">
               <span
                 style={{
                   fontFamily: "var(--font-display)",
@@ -973,10 +1052,10 @@ export default function DonutSections({
                 Small-batch patisserie — delivered with care, crafted with
                 intent.
               </p>
-            </div>
+            </motion.div>
 
             {/* Col 2 — Quick Links */}
-            <div className="flex flex-col gap-3">
+            <motion.div variants={fadeUp} className="flex flex-col gap-3">
               <h4
                 style={{
                   fontFamily: "var(--font-sans)",
@@ -1027,10 +1106,10 @@ export default function DonutSections({
                   </a>
                 </li>
               </ul>
-            </div>
+            </motion.div>
 
             {/* Col 3 — Support */}
-            <div className="flex flex-col gap-3">
+            <motion.div variants={fadeUp} className="flex flex-col gap-3">
               <h4
                 style={{
                   fontFamily: "var(--font-sans)",
@@ -1072,10 +1151,10 @@ export default function DonutSections({
                   </a>
                 </li>
               </ul>
-            </div>
+            </motion.div>
 
             {/* Col 4 — Follow Us */}
-            <div className="flex flex-col gap-3">
+            <motion.div variants={fadeUp} className="flex flex-col gap-3">
               <h4
                 style={{
                   fontFamily: "var(--font-sans)",
@@ -1123,8 +1202,8 @@ export default function DonutSections({
                   </a>
                 </li>
               </ul>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Copyright */}
           <div
